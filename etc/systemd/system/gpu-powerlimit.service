@@ -1,12 +1,12 @@
 [Unit]
-Description=Set RTX 5090 power limit (400 W)
+Description=Set RTX 5090 power limit (500 W)
 After=multi-user.target nvidia-persistenced.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/nvidia-smi -pm 1
-ExecStart=/usr/bin/nvidia-smi -pl 400
+ExecStart=/usr/bin/nvidia-smi -pl 500
 
 [Install]
 WantedBy=multi-user.target

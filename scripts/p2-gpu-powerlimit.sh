@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# P2: systemd-Dienst für das GPU-Leistungslimit (PRD 8.5 / N-OPS-04). Idempotent.
+# P2: systemd-Dienst für das GPU-Leistungslimit (PRD 8.5 / N-OPS-04, 500 W statt 400 W, siehe SETUP-LOG). Idempotent.
 set -euo pipefail
 SRC="$(dirname "$(readlink -f "$0")")/../etc/systemd/system/gpu-powerlimit.service"
 DST=/etc/systemd/system/gpu-powerlimit.service

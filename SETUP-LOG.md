@@ -126,6 +126,20 @@ Die Generierungsrate schwankt stark mit der MTP-Annahmequote (0,43–0,65 je Lau
 
 Hinweis zu A14: Mit `max_tokens=2048` hat das Modell bei 54k Kontext seine Denkphase teils nicht beendet und keine sichtbare Antwort mehr geliefert. Für die VRAM-Messung unerheblich; in Open WebUI gibt es kein solches Limit.
 
+#### Nachmessung 500 W (2026-10-03, auf Wunsch des Admins)
+
+| Messung | 400 W | 500 W | 575 W |
+|---|---|---|---|
+| A3 Generierung bei MTP-Quote ~0,62 | 123,5–127,7 Token/s | 142,4 Token/s | 147,7 Token/s |
+| A3 Generierung bei MTP-Quote ~0,45 | 99,6–103,3 Token/s (Vorlauf) | 119,9–122,1 Token/s | 118,3–120,2 Token/s |
+| A4 2 parallel, je | 98,4–109,0 Token/s | 122,6–124,6 Token/s | 121,2–123,6 Token/s |
+| Prefill 54k Tokens | ca. 1.920 Token/s | ca. 2.285 Token/s | ca. 2.460 Token/s |
+| Leistung unter Last (Mittel) | ca. 390 W | ca. 485–495 W | ca. 550–565 W |
+| Max. GPU-Temperatur | 66 °C | 69 °C | 77 °C |
+| VRAM | 24.676 MiB | 24.678 MiB | 24.678 MiB |
+
+500 W erreicht beim Generieren fast das Tempo von 575 W (bei 2 parallelen Anfragen gleichauf) und beim Prefill gut zwei Drittel des Zugewinns, bei ca. 70 W weniger Leistung und 8 °C niedrigerer Spitzentemperatur. A3, A4 und A14 sind auch bei 500 W bestanden.
+
 ### Abweichungen von der PRD
 
 - **P3-A1 – CUDA-Toolkit 13.3.1 aus dem NVIDIA-Repo** (8.2): Das Ubuntu-Paket (12.4) unterstützt Blackwell nicht; für Ubuntu 26.04 bietet NVIDIA kein 13.2 an. 13.3 läuft über die CUDA-Minor-Version-Kompatibilität mit Treiber 595 (CUDA 13.2).
@@ -133,4 +147,4 @@ Hinweis zu A14: Mit `max_tokens=2048` hat das Modell bei 54k Kontext seine Denkp
 - **P3-A3 – `mmproj-F16.gguf`**: wie in der PRD vermutet; im Repo gibt es zusätzlich `mmproj-BF16.gguf`.
 - **P3-A4 – llama-server.service**: `After=nvidia-persistenced.service` sowie Härtung (`NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`) ergänzt.
 - **P3-A5 – `CMAKE_CUDA_ARCHITECTURES=120a`**: explizit statt automatischer Erkennung gesetzt.
-- **Offen**: Entscheidung Leistungslimit 400 W vs. 575 W (oder Zwischenwert) durch den Admin. Aktuell 400 W.
+- **P3-A6 – GPU-Leistungslimit 500 W statt 400 W** (N-OPS-04, 8.5): Entscheidung des Admins nach den Messungen 400/500/575 W. `gpu-powerlimit.service` auf `-pl 500` geändert und aktiv (`nvidia-smi`: 500.00 W). 500 W liefert fast das Tempo von 575 W bei ca. 70 W weniger Leistung und 69 °C statt 77 °C Spitzentemperatur. A1 gilt damit mit 500 W.
