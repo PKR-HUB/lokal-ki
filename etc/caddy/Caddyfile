@@ -1,0 +1,12 @@
+# KI-Server: HTTPS im LAN (PRD 8.7)
+{
+	# Kein HTTP->HTTPS-Redirect auf Port 80 (Port ist per ufw ohnehin gesperrt)
+	auto_https disable_redirects
+	# Root-CA nicht in den Trust-Store des Servers installieren
+	skip_install_trust
+}
+
+https://192.168.10.129 {
+	tls internal
+	reverse_proxy 127.0.0.1:3000
+}

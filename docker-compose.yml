@@ -1,0 +1,39 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.4@sha256:9591b13f13843c7721c2b8eaf7382846c81b3ffe126526d1888d1fed50c6a33f   # Version fixiert (PRD N-OPS-03)
+    container_name: open-webui
+    network_mode: host
+    restart: always
+    volumes:
+      - open-webui:/app/backend/data
+    env_file: .env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      HOST: "127.0.0.1"
+      PORT: "3000"
+      WEBUI_URL: "https://192.168.10.129"
+      CORS_ALLOW_ORIGIN: "https://192.168.10.129"   # statt "*" (Ergänzung zur PRD)
+      # Modell-Anbindung
+      ENABLE_OLLAMA_API: "false"
+      OPENAI_API_BASE_URL: "http://127.0.0.1:8080/v1"
+      OPENAI_API_KEY: "none"
+      # Privatsphäre
+      ENABLE_ADMIN_CHAT_ACCESS: "false"
+      # Native / Agentic Function Calling als Standard
+      DEFAULT_MODEL_PARAMS: '{"function_calling":"native"}'
+      # Websuche: Brave
+      ENABLE_WEB_SEARCH: "true"
+      WEB_SEARCH_ENGINE: "brave"
+      WEB_SEARCH_RESULT_COUNT: "5"
+      WEB_SEARCH_CONCURRENT_REQUESTS: "1"
+      WEB_LOADER_CONCURRENT_REQUESTS: "2"
+      WEB_FETCH_MAX_CONTENT_LENGTH: "20000"
+      # Hintergrundlast reduzieren
+      ENABLE_AUTOCOMPLETE_GENERATION: "false"
+
+volumes:
+  open-webui:

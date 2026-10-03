@@ -148,3 +148,37 @@ Hinweis zu A14: Mit `max_tokens=2048` hat das Modell bei 54k Kontext seine Denkp
 - **P3-A4 – llama-server.service**: `After=nvidia-persistenced.service` sowie Härtung (`NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`) ergänzt.
 - **P3-A5 – `CMAKE_CUDA_ARCHITECTURES=120a`**: explizit statt automatischer Erkennung gesetzt.
 - **P3-A6 – GPU-Leistungslimit 500 W statt 400 W** (N-OPS-04, 8.5): Entscheidung des Admins nach den Messungen 400/500/575 W. `gpu-powerlimit.service` auf `-pl 500` geändert und aktiv (`nvidia-smi`: 500.00 W). 500 W liefert fast das Tempo von 575 W bei ca. 70 W weniger Leistung und 69 °C statt 77 °C Spitzentemperatur. A1 gilt damit mit 500 W.
+
+---
+
+## P4 Oberfläche – 2026-10-03
+
+### Durchgeführt
+
+| Schritt | Ergebnis |
+|---|---|
+| Pakete | `scripts/p4-packages.sh`: `docker.io` 29.1.3-0ubuntu4.1, `docker-compose-v2` 2.40.3, `caddy` 2.6.2-14 (alle aus Ubuntu) |
+| Umgebungsvariablen | Alle Variablen aus PRD 8.6 gegen `backend/open_webui/config.py`, `env.py` und `start.sh` von v0.11.4 geprüft: vorhanden und gleichnamig |
+| `.env` | `scripts/p4-env.sh`: `WEBUI_SECRET_KEY` zufällig (openssl rand -hex 32), `BRAVE_SEARCH_API_KEY=` leer für den Admin. Rechte 600, per `.gitignore` ausgeschlossen, von Claude Code nicht gelesen. |
+| Open WebUI | `docker-compose.yml`, `scripts/p4-openwebui.sh`: Image `ghcr.io/open-webui/open-webui:v0.11.4@sha256:9591b13f13843c7721c2b8eaf7382846c81b3ffe126526d1888d1fed50c6a33f` (1,65 GB), `network_mode: host`, `restart: always`, Logs 3 × 10 MB, Volume `ki_open-webui`. Lauscht auf 127.0.0.1:3000. |
+| Caddy | `etc/caddy/Caddyfile`, `scripts/p4-caddy.sh`: `https://192.168.10.129` mit `tls internal` → 127.0.0.1:3000. Original als `/etc/caddy/Caddyfile.orig` gesichert. |
+| Root-Zertifikat | `client/caddy-root.crt` (CN „Caddy Local Authority - 2026 ECC Root“, gültig bis 11.08.2036, SHA256 `43:FC:E6:3A:6D:F8:EF:0E:E5:56:1D:41:41:3B:58:FE:8E:10:4A:A3:48:7B:CE:C1:0D:BE:90:75:E8:48:93:13`). Öffentlich; der private Schlüssel bleibt in `/var/lib/caddy`. |
+
+Beim ersten Start lädt Open WebUI das Standard-Embedding-Modell für RAG von Hugging Face (keine Büro-Daten). Der erste Image-Pull scheiterte an einer DNS-Zeitüberschreitung, der zweite Versuch lief durch (vgl. Verbindungsabbrüche in P3).
+
+### Tests
+
+| Test | Ergebnis |
+|---|---|
+| Lauschende Ports nach außen | nur 22 (sshd) und 443 (Caddy) ✅; 3000, 8080, 2019 nur auf 127.0.0.1 |
+| `https://192.168.10.129` auf dem Server | HTTP 200, Zertifikatsprüfung gegen `caddy-root.crt` ok ✅ |
+| `/api/config` | Open WebUI 0.11.4, Anmeldung aktiv ✅ |
+| Docker | Restart-Policy `always`, Netzwerk `host`, Log-Rotation 3 × 10 MB ✅ |
+| Anmeldeseite aus dem LAN, A11 Port 443 | siehe unten (Test vom Admin-PC) |
+
+### Abweichungen von der PRD
+
+- **P4-A1 – Image zusätzlich per Digest fixiert** (N-OPS-03): Tag plus `@sha256:…`, damit ein neu gebautes Tag nicht unbemerkt ein anderes Image liefert.
+- **P4-A2 – `CORS_ALLOW_ORIGIN=https://192.168.10.129`** statt Standard `*` (Open WebUI warnt sonst „NOT RECOMMENDED FOR PRODUCTION“).
+- **P4-A3 – Caddy-Globaloptionen** `auto_https disable_redirects` (kein Listener auf Port 80) und `skip_install_trust` (Root-CA nicht in den Trust-Store des Servers).
+- **P4-A4 – Caddy 2.6.2 aus Ubuntu** wie in der PRD; das offizielle Caddy-Repo wäre aktueller (2.10.x), für `tls internal` im LAN reicht 2.6.2.
