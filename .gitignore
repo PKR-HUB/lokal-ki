@@ -1,0 +1,4 @@
+# Secrets – niemals committen (PRD N-SEC-05)
+.env
+*.env
+client/*-personal*.json
