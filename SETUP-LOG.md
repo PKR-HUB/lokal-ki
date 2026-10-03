@@ -209,3 +209,15 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 | Ports nach außen | nur 22 und 443 ✅ |
 
 **A2 bestanden.** Hinweis: Open WebUI meldet `onboarding: true`, das Admin-Konto ist noch nicht angelegt.
+
+---
+
+## P5 Konfiguration – Beginn 2026-10-03
+
+| Schritt | Ergebnis |
+|---|---|
+| Admin-Konto | durch den Admin angelegt ✅ |
+| Registrierung (F-UI-02) | `enable_signup: false`; Test-Registrierung per `POST /api/v1/auths/signup` → HTTP 403 ✅ (**A10 bestanden**) |
+| API-Schlüssel (F-UI-08) | global aktiviert, Admin hat einen persönlichen Schlüssel erstellt ✅. Offen: Berechtigung „API Keys“ für normale Nutzer (Standardrechte oder Gruppe „Entwicklung“) |
+
+Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-PC. Server-seitig unauffällig (Link stabil, IP unverändert, keine SSH-Versuche oder ufw-Blocks auf Port 22 im Log), Ursache lag im Büronetz (gleichzeitige Internetstörung, verspätete DNS-Antworten von .9).
