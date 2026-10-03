@@ -2,3 +2,5 @@
 .env
 *.env
 client/*-personal*.json
+# Temporärer Open-WebUI-Admin-Schlüssel für P5 (nach P5 löschen)
+.owui-admin-key
