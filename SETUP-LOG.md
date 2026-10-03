@@ -221,10 +221,13 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 | API-Schlüssel (F-UI-08) | global aktiviert, Admin hat einen persönlichen Schlüssel erstellt ✅. Standardrecht `features.api_keys: false`, keine Gruppen → normale Nutzer können keine Schlüssel erstellen (siehe P5-A1) |
 | Websuche | Brave, Schlüssel durch den Admin in der Oberfläche eingetragen (in der DB, nicht in `.env`), 5 Ergebnisse ✅ |
 | Standardrechte Nutzer | an: Datei-Upload, Websuche, Code-Interpreter, eigener System-Prompt/Parameter. **Aus:** API-Schlüssel, Bildgenerierung (auch global aus, nicht angebunden), Sprache (Diktat `stt`, Vorlesen `tts`, Anruf `call`). Geändert direkt in `config.user.permissions` der Open-WebUI-DB, vorher Sicherung `data/webui.db.bak-p5-perms` im Volume, danach Neustart; Werte nach Neustart bestätigt ✅ |
+| Modell-Profile (8.9) | Über Open WebUIs eigene Modell-Klasse angelegt, vorher Sicherung `data/webui.db.bak-p5-models`. **`qwen3.8-27b (Basis)`**: versteckt, Lesezugriff für alle (sonst dürfen Nutzer keine Profile darauf nutzen). **`Qwen3.8`** (ID `qwen38`): für alle, System-Prompt aus 8.9, Websuche, Vision, Upload, Code-Interpreter, eingebaute Werkzeuge an, Bild aus. **`qwen38-code`**: nur Admin, kein System-Prompt, Websuche, Code-Interpreter, Memory und eingebaute Werkzeuge aus. Beide: `chat_template_kwargs {"reasoning_effort":"medium"}`, temperature 1.0, top_p 0.95, top_k 20, min_p 0, presence 0, repeat 1.0, Function Calling native ✅ |
+| System-Prompt | Test: Qwen3.8 meldet sich als Büro-Assistent in Sie-Form ✅. Eigener System-Prompt eines Nutzers wird angehängt und befolgt (Test „duzen, mit Moin beginnen“ → befolgt) ✅. Open WebUI setzt den Profil-Prompt vor den Nutzer-Prompt. |
+| Arena-Modell | `evaluation.arena.enable` aus (Blindvergleich ist mit einem Modell sinnlos, verwirrt nur in der Auswahl) ✅ |
 
 **Abweichungen P5:**
 - **P5-A1 – API-Schlüssel nur für den Admin** (F-UI-08, F-COD-01, A12): Auf Wunsch des Admins bekommt nur er einen API-Schlüssel. Alle anderen nutzen ausschließlich die Weboberfläche. Die Berechtigung „API Keys“ bleibt in den Standardrechten aus, eine Gruppe „Entwicklung“ wird nicht angelegt. A12 (IDE-Anbindung) wird nur mit dem Admin-Schlüssel geprüft.
-- **P5-A2 – Pi gestrichen** (8.12, F-COD-02, A15): Pi ist laut Admin nicht Teil dieses Projekts. Keine Pi-Vorlage, A15 entfällt. Das Profil `qwen38-code` bleibt optional für spätere IDE-Anbindungen.
+- **P5-A2 – Pi später** (8.12, A15): Pi selbst wird später eingerichtet. Was Pi auf dem Server braucht, ist jetzt angelegt (Profil `qwen38-code`, Admin-Schlüssel). Die Vorlage `client/pi-models.json` und A15 folgen mit Pi.
 - **P5-A3 – A12 verschoben:** IDE-Anbindung wird später geprüft, nicht Voraussetzung für den Abschluss von P5.
 
 P4-Nachtrag: Port-Test vom Admin-PC durch den Admin erledigt ✅ (P4 abgeschlossen).
