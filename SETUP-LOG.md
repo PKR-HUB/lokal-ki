@@ -219,6 +219,8 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 | Admin-Konto | durch den Admin angelegt ✅ |
 | Registrierung (F-UI-02) | `enable_signup: false`; Test-Registrierung per `POST /api/v1/auths/signup` → HTTP 403 ✅ (**A10 bestanden**) |
 | API-Schlüssel (F-UI-08) | global aktiviert, Admin hat einen persönlichen Schlüssel erstellt ✅. Standardrecht `features.api_keys: false`, keine Gruppen → normale Nutzer können keine Schlüssel erstellen (siehe P5-A1) |
+| Websuche | Brave, Schlüssel durch den Admin in der Oberfläche eingetragen (in der DB, nicht in `.env`), 5 Ergebnisse ✅ |
+| Standardrechte Nutzer | an: Datei-Upload, Websuche, Code-Interpreter, eigener System-Prompt/Parameter. **Aus:** API-Schlüssel, Bildgenerierung (auch global aus, nicht angebunden), Sprache (Diktat `stt`, Vorlesen `tts`, Anruf `call`). Geändert direkt in `config.user.permissions` der Open-WebUI-DB, vorher Sicherung `data/webui.db.bak-p5-perms` im Volume, danach Neustart; Werte nach Neustart bestätigt ✅ |
 
 **Abweichungen P5:**
 - **P5-A1 – API-Schlüssel nur für den Admin** (F-UI-08, F-COD-01, A12): Auf Wunsch des Admins bekommt nur er einen API-Schlüssel. Alle anderen nutzen ausschließlich die Weboberfläche. Die Berechtigung „API Keys“ bleibt in den Standardrechten aus, eine Gruppe „Entwicklung“ wird nicht angelegt. A12 (IDE-Anbindung) wird nur mit dem Admin-Schlüssel geprüft.
