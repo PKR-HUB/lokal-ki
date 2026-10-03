@@ -39,7 +39,7 @@ Alle Skripte zweimal ausgeführt – zweiter Lauf ohne Änderungen (idempotent).
 | Schlüssel-Login aus dem LAN (192.168.10.142) | funktioniert ✅ |
 | Root-Login | `permitrootlogin no` ✅ |
 | Lauschende Ports außerhalb localhost | nur 22/tcp ✅ (443 folgt in P4) |
-| A11 (vorläufig), Port-Scan vom Büro-PC | siehe unten |
+| A11 (vorläufig), Port-Scan vom Büro-PC 192.168.10.142 | 22: offen, 443: zu (Caddy erst in P4), 3000: zu, 8080: zu ✅ – 443 in P4 erneut prüfen |
 
 ### Abweichungen von der PRD
 
