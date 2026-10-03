@@ -218,6 +218,9 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 |---|---|
 | Admin-Konto | durch den Admin angelegt ✅ |
 | Registrierung (F-UI-02) | `enable_signup: false`; Test-Registrierung per `POST /api/v1/auths/signup` → HTTP 403 ✅ (**A10 bestanden**) |
-| API-Schlüssel (F-UI-08) | global aktiviert, Admin hat einen persönlichen Schlüssel erstellt ✅. Offen: Berechtigung „API Keys“ für normale Nutzer (Standardrechte oder Gruppe „Entwicklung“) |
+| API-Schlüssel (F-UI-08) | global aktiviert, Admin hat einen persönlichen Schlüssel erstellt ✅. Standardrecht `features.api_keys: false`, keine Gruppen → normale Nutzer können keine Schlüssel erstellen (siehe P5-A1) |
+
+**Abweichungen P5:**
+- **P5-A1 – API-Schlüssel nur für den Admin** (F-UI-08, F-COD-01, A12): Auf Wunsch des Admins bekommt nur er einen API-Schlüssel. Alle anderen nutzen ausschließlich die Weboberfläche. Die Berechtigung „API Keys“ bleibt in den Standardrechten aus, eine Gruppe „Entwicklung“ wird nicht angelegt. A12 (IDE-Anbindung) wird nur mit dem Admin-Schlüssel geprüft.
 
 Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-PC. Server-seitig unauffällig (Link stabil, IP unverändert, keine SSH-Versuche oder ufw-Blocks auf Port 22 im Log), Ursache lag im Büronetz (gleichzeitige Internetstörung, verspätete DNS-Antworten von .9).
