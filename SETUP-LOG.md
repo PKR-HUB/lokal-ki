@@ -192,3 +192,20 @@ Beim ersten Start lädt Open WebUI das Standard-Embedding-Modell für RAG von Hu
 - Vor dem ersten Push die gesamte History auf Secrets geprüft (`.env`, Schlüssel, API-Keys): keine Treffer. Im Repo liegen nur Konfiguration, Skripte, SETUP-LOG, Messwerte und das öffentliche Caddy-Root-Zertifikat.
 - Pushes führt Claude Code nach jeder Phase selbst aus (vom Admin ausdrücklich freigegeben).
 - Bei der Abschaltung (PRD 10): Deploy Key in GitHub entfernen; das Repo enthält keine Büro-Daten.
+
+---
+
+## A2 Server-Neustart – 2026-10-03
+
+Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
+
+| Prüfung | Ergebnis |
+|---|---|
+| llama-server | active, `/health` ok, Modell geladen (VRAM 24.628 MiB) ✅ |
+| Open WebUI | Container `healthy`, `/health` ok ✅ |
+| Caddy | active, `https://192.168.10.129` HTTP 200 ✅ |
+| gpu-powerlimit | active, 500 W ✅ |
+| ufw / SSH-Härtung / unattended-upgrades | aktiv, Passwort-Login aus ✅ |
+| Ports nach außen | nur 22 und 443 ✅ |
+
+**A2 bestanden.** Hinweis: Open WebUI meldet `onboarding: true`, das Admin-Konto ist noch nicht angelegt.
