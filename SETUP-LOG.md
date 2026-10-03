@@ -44,3 +44,37 @@ Alle Skripte zweimal ausgeführt – zweiter Lauf ohne Änderungen (idempotent).
 ### Abweichungen von der PRD
 
 - **P1-A1 – SSH aus dem ganzen Büronetz statt nur von ADMIN_IP** (N-SEC-01, 8.8): Auf Wunsch des Admins entfällt die Beschränkung auf eine einzelne Admin-IP. SSH ist aus 192.168.10.0/24 erlaubt, aber nur mit Schlüssel (Passwort-Login aus). Damit ist A11 so zu lesen: „22 aus dem Büronetz, nur per Schlüssel“.
+
+---
+
+## P2 Treiber – 2026-10-03
+
+### Auswahl
+
+- NVIDIA-Stand am 2026-10-03 (download.nvidia.com, Release-Meldungen): Production Branch (stable) **R595**, neueste Version 595.104.02 (23.09.2026). R610/R615 sind New-Feature-Branches.
+- Ubuntu 26.04 (resolute-updates/-security) und das NVIDIA-CUDA-Repo (ubuntu2604) bieten bisher nur **595.91.07**.
+- Entscheidung des Admins: Ubuntu-Paket 595.91.07. Automatische Updates (auch auf 595.104.02, sobald verfügbar) kommen über unattended-upgrades, die Kernel-Module laufen mit dem Kernel-Metapaket mit. Kein `.run`-Installer.
+- Secure Boot: deaktiviert.
+
+### Durchgeführt
+
+| Schritt | Ergebnis |
+|---|---|
+| Treiber | `scripts/p2-nvidia-driver.sh`: `nvidia-headless-595-open`, `nvidia-utils-595` 595.91.07-0ubuntu0.26.04.1, `linux-modules-nvidia-595-open-generic` 7.0.0-38.38+1 (vorgebaute offene Kernel-Module) |
+| nouveau | durch `/lib/modprobe.d/nvidia-graphics-drivers.conf` gesperrt, nach dem Neustart nicht geladen |
+| Neustart | 2026-10-03 14:57 UTC, SSH/ufw/Härtung danach unverändert aktiv |
+| Leistungslimit | `/etc/systemd/system/gpu-powerlimit.service` (Quelle `etc/systemd/system/`, Skript `scripts/p2-gpu-powerlimit.sh`), aktiviert |
+
+### Tests
+
+| Test | Ergebnis |
+|---|---|
+| A1 `nvidia-smi` nach Neustart | NVIDIA GeForce RTX 5090, 32607 MiB, Treiber 595.91.07 (Open Kernel Module), CUDA 13.2, PCIe Gen5 x16 ✅ |
+| A1 Leistungslimit | 400 W (Standard 575 W, Bereich 400–600 W), Persistence Mode an, Dienst `active (exited)`, Journal: „set to 400.00 W from 575.00 W“ ✅ |
+
+### Abweichungen von der PRD
+
+- **P2-A1 – `nvidia-headless-595-open` statt `nvidia-driver-595-open`** (1, 8.1): gleicher Treiber und gleiche Kernel-Module mit `nvidia-smi` und CUDA-Bibliotheken, aber 13 statt 142 Pakete, ohne Xorg/GTK. Auf dem Server gibt es keinen Desktop, die Bildschirmausgabe läuft über die iGPU.
+- **P2-A2 – Treiberversion 595.91.07 statt der neuesten Stable-Version 595.104.02**: Die neuere Version ist noch nicht als Ubuntu-Paket verfügbar (siehe Auswahl).
+- **P2-A3 – `gpu-powerlimit.service`** (8.5): `RemainAfterExit=yes` (Status bleibt sichtbar) und `After=nvidia-persistenced.service` ergänzt.
+- Hinweis: 400 W ist das **Minimum**, das der Treiber für diese Karte zulässt. Ein niedrigeres Limit ist nicht möglich.
