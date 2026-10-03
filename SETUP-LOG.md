@@ -78,3 +78,59 @@ Alle Skripte zweimal ausgeführt – zweiter Lauf ohne Änderungen (idempotent).
 - **P2-A2 – Treiberversion 595.91.07 statt der neuesten Stable-Version 595.104.02**: Die neuere Version ist noch nicht als Ubuntu-Paket verfügbar (siehe Auswahl).
 - **P2-A3 – `gpu-powerlimit.service`** (8.5): `RemainAfterExit=yes` (Status bleibt sichtbar) und `After=nvidia-persistenced.service` ergänzt.
 - Hinweis: 400 W ist das **Minimum**, das der Treiber für diese Karte zulässt. Ein niedrigeres Limit ist nicht möglich.
+
+---
+
+## P3 Inferenz – 2026-10-03
+
+### Durchgeführt
+
+| Schritt | Ergebnis |
+|---|---|
+| CUDA-Toolkit | `scripts/p3-cuda-toolkit.sh`: `cuda-toolkit-13-3` 13.3.1-1 (nvcc V13.3.73) aus dem NVIDIA-Repo `ubuntu2604`, per `apt-mark hold` fixiert. Ubuntu-Paket `nvidia-cuda-toolkit` ist nur 12.4 (kein sm_120). Pinning `/etc/apt/preferences.d/nvidia-cuda-repo` (Priorität 100): Treiberpakete kommen weiter von Ubuntu. |
+| llama.cpp | `scripts/p3-build-llama.sh`: Tag **b11378**, Commit `edd6e2bbdad5930899a93db8fa73c3b61c7b9bcc`, CUDA-Arch `120a`, statisch, Ziele `llama-server` und `llama-bench`. Build vom Admin gestartet (Claude-Code-Sicherheitsprüfung hatte den Aufruf blockiert). |
+| Modell | `scripts/p3-download-model.sh`: `Qwen3.8-27B-UD-Q4_K_XL.gguf` (17.559.178.144 Byte) und `mmproj-F16.gguf` (927.607.488 Byte) aus `unsloth/Qwen3.8-27B-GGUF`, SHA256 gegen das HF-Repo geprüft ✅. Download per curl statt `hf`-CLI. 10 Verbindungsabbrüche (`Connection reset by peer`) wurden per Wiederaufnahme überbrückt. |
+| MTP | Die MTP-Schichten sind in der Modelldatei enthalten (`blk.64.nextn.*`, `qwen35.nextn_predict_layers`), keine separate `mtp-*.gguf` nötig. Log: „creating MTP draft context against the target model“. |
+| Dienst | `etc/systemd/system/llama-server.service`, `scripts/p3-llama-service.sh`. Flags gegen den Quellcode von b11378 geprüft (`--spec-type draft-mtp`, `--spec-draft-n-max`, `--chat-template-kwargs`, `-fa on`, `--cache-type-k/v`, `--metrics`): alle unverändert gültig. Läuft als `llm`, lauscht nur auf 127.0.0.1:8080. |
+
+Server-Hinweise im Log (bewertet, keine Änderung):
+- „no API key is set“: unkritisch, da nur 127.0.0.1 und ufw.
+- „Qwen-VL … try adding --image-min-tokens 1024“: nur für Grounding-Aufgaben relevant, bei A5 beobachten.
+- „chat template supports preserving reasoning, enabled by default“: Hinweis zur Token-Nutzung.
+
+### Tests (synthetische Prompts, `scripts/p3-bench.py`, Rohdaten in `bench/p3-2026-10-03/`)
+
+Leistungslimit 400 W (Betriebseinstellung) und Vergleich 575 W (Treiber-Standard). Eindeutige Test-ID je Anfrage, kein Prompt-Cache.
+
+| Messung | 400 W | 575 W |
+|---|---|---|
+| A3: 500-Wörter-E-Mail, Generierung (3 Läufe) | 127,7 / 123,5 / 125,3 Token/s | 147,7 / 120,2 / 118,3 Token/s |
+| A3: Gesamtzeit inkl. Denkphase | 19,2 / 21,2 / 19,8 s | 18,4 / 11,2 / 12,8 s |
+| A3: erste sichtbare Antwort | 13–15 s | 2–14 s |
+| A4: 2 parallel, je | 109,0 / 98,4 Token/s | 121,2 / 123,6 Token/s |
+| A4: 3. Anfrage | wartet bis Slot frei (Denkbeginn nach 15,8 s), wird beantwortet | wartet (19,0 s), wird beantwortet |
+| Prefill langer Kontext (54k Tokens, 2 Slots) | ca. 1.920 Token/s | ca. 2.460 Token/s |
+| Leistungsaufnahme unter Last (Mittel / Spitze) | 378–398 W / 413 W | 489–567 W / 588 W |
+| Max. GPU-Temperatur | 66 °C | 77 °C |
+| A14: VRAM (2 Slots × 54k Kontext) | 24.676 MiB | 24.678 MiB |
+
+Die Generierungsrate schwankt stark mit der MTP-Annahmequote (0,43–0,65 je Lauf). Bei vergleichbarer Quote (~0,62) liefert 575 W etwa 15–20 % mehr Token/s, beim Prefill etwa 28 % mehr. Die PRD-Annahme „kaum Tempoverlust“ bei 400 W trifft damit nur eingeschränkt zu, die Zielwerte werden aber auch mit 400 W erreicht. Ein früherer Einzellauf bei 400 W mit niedriger Quote (0,43) lag bei 99,6 Token/s, also knapp unter 100.
+
+| Test | Ergebnis |
+|---|---|
+| `/health` | `{"status":"ok"}` ✅ |
+| A3 (≥ 100 Token/s, < 30 s) | ✅ bei 400 W (123–128 Token/s, ≤ 21,2 s); Einzelläufe mit niedriger MTP-Quote können knapp unter 100 Token/s liegen |
+| A4 (je ≥ 50 Token/s, 3. wartet) | ✅ |
+| A14 (VRAM ≤ 29 GB) | ✅ 24,1 GiB; der KV-Cache wird beim Start komplett reserviert, der Wert ist lastunabhängig |
+| N-PERF-03 (sichtbare Antwort < 20 s) | ✅ alle Einzel-/Parallel-Anfragen ≤ 16 s (außer wartende 3. Anfrage) |
+
+Hinweis zu A14: Mit `max_tokens=2048` hat das Modell bei 54k Kontext seine Denkphase teils nicht beendet und keine sichtbare Antwort mehr geliefert. Für die VRAM-Messung unerheblich; in Open WebUI gibt es kein solches Limit.
+
+### Abweichungen von der PRD
+
+- **P3-A1 – CUDA-Toolkit 13.3.1 aus dem NVIDIA-Repo** (8.2): Das Ubuntu-Paket (12.4) unterstützt Blackwell nicht; für Ubuntu 26.04 bietet NVIDIA kein 13.2 an. 13.3 läuft über die CUDA-Minor-Version-Kompatibilität mit Treiber 595 (CUDA 13.2).
+- **P3-A2 – Modell-Download per curl statt `hf`-CLI** (8.3): Ubuntu 26.04 blockiert systemweites `pip install` (PEP 668). curl mit Wiederaufnahme und SHA256-Prüfung braucht keine Zusatzsoftware.
+- **P3-A3 – `mmproj-F16.gguf`**: wie in der PRD vermutet; im Repo gibt es zusätzlich `mmproj-BF16.gguf`.
+- **P3-A4 – llama-server.service**: `After=nvidia-persistenced.service` sowie Härtung (`NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`) ergänzt.
+- **P3-A5 – `CMAKE_CUDA_ARCHITECTURES=120a`**: explizit statt automatischer Erkennung gesetzt.
+- **Offen**: Entscheidung Leistungslimit 400 W vs. 575 W (oder Zwischenwert) durch den Admin. Aktuell 400 W.

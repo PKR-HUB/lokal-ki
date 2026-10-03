@@ -1,0 +1,6 @@
+# NVIDIA-CUDA-Repo nur für das CUDA-Toolkit verwenden.
+# Priorität 100: Pakete, die es auch bei Ubuntu gibt (Treiber!), kommen weiter von Ubuntu.
+# Keine automatischen Upgrades aus diesem Repo (Version fixieren, PRD N-OPS-03).
+Package: *
+Pin: release o=NVIDIA,l=NVIDIA CUDA
+Pin-Priority: 100

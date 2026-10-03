@@ -1,0 +1,30 @@
+[Unit]
+Description=llama.cpp server (Qwen3.8-27B UD-Q4_K_XL)
+After=network-online.target nvidia-persistenced.service
+Wants=network-online.target
+
+[Service]
+User=llm
+Group=llm
+ExecStart=/opt/llama.cpp/build/bin/llama-server \
+  -m /srv/models/qwen3.8-27b/Qwen3.8-27B-UD-Q4_K_XL.gguf \
+  --mmproj /srv/models/qwen3.8-27b/mmproj-F16.gguf \
+  --alias qwen3.8-27b \
+  -ngl 99 -fa on \
+  -c 131072 -np 2 \
+  --cache-type-k q8_0 --cache-type-v q8_0 \
+  --jinja \
+  --chat-template-kwargs '{"reasoning_effort":"medium"}' \
+  --spec-type draft-mtp --spec-draft-n-max 3 \
+  --metrics \
+  --host 127.0.0.1 --port 8080
+Restart=always
+RestartSec=5
+# Härtung (Ergänzung zur PRD): Dienst darf nur lesen, kein Zugriff auf /home
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

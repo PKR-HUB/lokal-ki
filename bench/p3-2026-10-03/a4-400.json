@@ -1,0 +1,61 @@
+{
+ "a4": {
+  "requests": [
+   {
+    "label": "A4-1",
+    "start_s": 1791043940.86,
+    "first_think_s": 0.39,
+    "first_answer_s": 16.02,
+    "total_s": 23.61,
+    "prompt_tokens": 137,
+    "prefill_tok_s": 542.8,
+    "gen_tokens": 2531,
+    "gen_tok_s": 109.0,
+    "draft_n": 2691,
+    "draft_accepted": 1633,
+    "answer_words": 655,
+    "think_chars": 6246,
+    "draft_accept_rate": 0.61
+   },
+   {
+    "label": "A4-2",
+    "start_s": 1791043940.86,
+    "first_think_s": 0.39,
+    "first_answer_s": 4.19,
+    "total_s": 16.54,
+    "prompt_tokens": 136,
+    "prefill_tok_s": 552.7,
+    "gen_tokens": 1590,
+    "gen_tok_s": 98.4,
+    "draft_n": 1902,
+    "draft_accepted": 955,
+    "answer_words": 694,
+    "think_chars": 1572,
+    "draft_accept_rate": 0.5
+   },
+   {
+    "label": "A4-3",
+    "start_s": 1791043941.86,
+    "first_think_s": 15.83,
+    "first_answer_s": 18.7,
+    "total_s": 29.11,
+    "prompt_tokens": 138,
+    "prefill_tok_s": 849.2,
+    "gen_tokens": 1271,
+    "gen_tok_s": 95.6,
+    "draft_n": 1617,
+    "draft_accepted": 731,
+    "answer_words": 606,
+    "think_chars": 1239,
+    "draft_accept_rate": 0.45
+   }
+  ],
+  "gpu": {
+   "power_limit_w": 400.0,
+   "power_max_w": 413.3,
+   "power_avg_w": 397.0,
+   "temp_max_c": 64.0,
+   "vram_max_mib": 24674.0
+  }
+ }
+}
