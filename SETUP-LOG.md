@@ -224,5 +224,9 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 
 **Abweichungen P5:**
 - **P5-A1 – API-Schlüssel nur für den Admin** (F-UI-08, F-COD-01, A12): Auf Wunsch des Admins bekommt nur er einen API-Schlüssel. Alle anderen nutzen ausschließlich die Weboberfläche. Die Berechtigung „API Keys“ bleibt in den Standardrechten aus, eine Gruppe „Entwicklung“ wird nicht angelegt. A12 (IDE-Anbindung) wird nur mit dem Admin-Schlüssel geprüft.
+- **P5-A2 – Pi gestrichen** (8.12, F-COD-02, A15): Pi ist laut Admin nicht Teil dieses Projekts. Keine Pi-Vorlage, A15 entfällt. Das Profil `qwen38-code` bleibt optional für spätere IDE-Anbindungen.
+- **P5-A3 – A12 verschoben:** IDE-Anbindung wird später geprüft, nicht Voraussetzung für den Abschluss von P5.
+
+P4-Nachtrag: Port-Test vom Admin-PC durch den Admin erledigt ✅ (P4 abgeschlossen).
 
 Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-PC. Server-seitig unauffällig (Link stabil, IP unverändert, keine SSH-Versuche oder ufw-Blocks auf Port 22 im Log), Ursache lag im Büronetz (gleichzeitige Internetstörung, verspätete DNS-Antworten von .9).
