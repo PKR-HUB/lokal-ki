@@ -182,3 +182,13 @@ Beim ersten Start lädt Open WebUI das Standard-Embedding-Modell für RAG von Hu
 - **P4-A2 – `CORS_ALLOW_ORIGIN=https://192.168.10.129`** statt Standard `*` (Open WebUI warnt sonst „NOT RECOMMENDED FOR PRODUCTION“).
 - **P4-A3 – Caddy-Globaloptionen** `auto_https disable_redirects` (kein Listener auf Port 80) und `skip_install_trust` (Root-CA nicht in den Trust-Store des Servers).
 - **P4-A4 – Caddy 2.6.2 aus Ubuntu** wie in der PRD; das offizielle Caddy-Repo wäre aktueller (2.10.x), für `tls internal` im LAN reicht 2.6.2.
+
+---
+
+## Externe Kopie der Konfiguration – 2026-10-03
+
+- Das lokale Repo liegt auf derselben SSD wie der Server. Für die Neuinstallation nach einem Hardwaredefekt (PRD 12) wird es zusätzlich in ein **privates** GitHub-Repo gespiegelt: `PKR-HUB/lokal-ki` (Entscheidung des Admins).
+- Zugriff über einen eigenen Deploy Key `~msb/.ssh/github_ki_deploy` (ED25519, nur dieses Repo, Schreibrecht), SSH-Alias `github-ki` in `~msb/.ssh/config`. Host-Key von github.com gegen den veröffentlichten Fingerprint `SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU` geprüft.
+- Vor dem ersten Push die gesamte History auf Secrets geprüft (`.env`, Schlüssel, API-Keys): keine Treffer. Im Repo liegen nur Konfiguration, Skripte, SETUP-LOG, Messwerte und das öffentliche Caddy-Root-Zertifikat.
+- Erster Push (Stand `7829c86`) durch Claude Code. Weitere Pushes führt der Admin aus (`git -C /srv/ki push`), da die Sicherheitsprüfung von Claude Code Pushes als Datenabfluss blockiert.
+- Bei der Abschaltung (PRD 10): Deploy Key in GitHub entfernen; das Repo enthält keine Büro-Daten.
