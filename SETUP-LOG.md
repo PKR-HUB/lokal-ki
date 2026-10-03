@@ -190,5 +190,5 @@ Beim ersten Start lädt Open WebUI das Standard-Embedding-Modell für RAG von Hu
 - Das lokale Repo liegt auf derselben SSD wie der Server. Für die Neuinstallation nach einem Hardwaredefekt (PRD 12) wird es zusätzlich in ein **privates** GitHub-Repo gespiegelt: `PKR-HUB/lokal-ki` (Entscheidung des Admins).
 - Zugriff über einen eigenen Deploy Key `~msb/.ssh/github_ki_deploy` (ED25519, nur dieses Repo, Schreibrecht), SSH-Alias `github-ki` in `~msb/.ssh/config`. Host-Key von github.com gegen den veröffentlichten Fingerprint `SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU` geprüft.
 - Vor dem ersten Push die gesamte History auf Secrets geprüft (`.env`, Schlüssel, API-Keys): keine Treffer. Im Repo liegen nur Konfiguration, Skripte, SETUP-LOG, Messwerte und das öffentliche Caddy-Root-Zertifikat.
-- Erster Push (Stand `7829c86`) durch Claude Code. Weitere Pushes führt der Admin aus (`git -C /srv/ki push`), da die Sicherheitsprüfung von Claude Code Pushes als Datenabfluss blockiert.
+- Pushes führt Claude Code nach jeder Phase selbst aus (vom Admin ausdrücklich freigegeben).
 - Bei der Abschaltung (PRD 10): Deploy Key in GitHub entfernen; das Repo enthält keine Büro-Daten.
