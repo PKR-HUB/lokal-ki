@@ -32,9 +32,11 @@ scripts/p3-llama-service.sh      # llama-server-Unit installieren, Neustart, war
 scripts/p4-caddy.sh              # Caddyfile validieren und installieren
 scripts/p4-openwebui.sh          # docker compose up -d, warten auf /health
 scripts/p5-profile.sh            # Modell-Profile aus Büro.md/Backoffice.md/Recherche.md/Vorschläge.json setzen (nur bei Abweichung: Sicherung, Neustart)
+scripts/p6-retention.sh          # Timer chat-retention (täglich) installieren
+sudo scripts/p6-loeschung.sh --probelauf   # zählen, was nach 90 Tagen gelöscht würde (ohne --probelauf: löschen)
 
 # Zustand prüfen
-systemctl status llama-server caddy gpu-powerlimit
+systemctl status llama-server caddy gpu-powerlimit chat-retention.timer
 curl -fsS http://127.0.0.1:8080/health
 curl -fsS http://127.0.0.1:3000/health
 sudo docker compose -f /srv/ki/docker-compose.yml ps

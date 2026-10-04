@@ -1,0 +1,9 @@
+[Unit]
+Description=Open WebUI: Chats und Dateien nach 90 Tagen löschen (PRD 8.11)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+Environment=TAGE=90
+ExecStart=/srv/ki/scripts/p6-loeschung.sh
