@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # P6: Chats nach 90 Tagen ohne Aktivität löschen, dazu hochgeladene Dateien, die nirgends mehr
 # verwendet werden (PRD 8.11, F-UI-10). Ebenso Bewertungen (feedback), weil sie eine Kopie des Chats
-# enthalten. Läuft täglich über chat-retention.timer.
+# enthalten, und Sicherungen data/webui.db.bak-* (vollständige DB-Kopien mit Chats). Läuft täglich über
+# chat-retention.timer.
 # Wissensdatenbanken und ihre Dateien bleiben. Ins Journal gehen nur Anzahlen, keine Inhalte.
 # Aufruf: p6-loeschung.sh [--probelauf]   (Probelauf: nur zählen, nichts löschen)
 # Umgebung: TAGE (Standard 90)
@@ -12,7 +13,7 @@ PROBELAUF=0
 
 read -r -d '' PY <<'EOF' || true
 # Löscht über Open WebUIs eigene Modell-Klassen, wie DELETE /api/v1/chats/{id} und /api/v1/files/{id}.
-import asyncio, os, sqlite3, time
+import asyncio, glob, os, sqlite3, time
 from open_webui.models.chats import Chats
 from open_webui.models.files import Files
 from open_webui.models.feedbacks import Feedbacks
@@ -112,10 +113,18 @@ async def main():
             if not PROBE:
                 await ASYNC_VECTOR_DB_CLIENT.delete_collection(name)
 
+    # 5) Sicherungen der DB (webui.db.bak-*): enthalten die Chats zum Zeitpunkt der Sicherung
+    sicherungen = 0
+    for f in glob.glob("/app/backend/data/webui.db.bak-*"):
+        if os.path.getmtime(f) < GRENZE:
+            sicherungen += 1
+            if not PROBE:
+                os.remove(f)
+
     art = "Probelauf, nichts gelöscht" if PROBE else "gelöscht"
     print(f"chat-retention ({TAGE} Tage, {art}): Chats {chats}, Kind-Chats {kinder}, "
           f"Datei-Verknüpfungen {verwaist}, Bewertungen {bewertungen}, Dateien {dateien}, "
-          f"Vektor-Sammlungen {vektoren}")
+          f"Vektor-Sammlungen {vektoren}, Sicherungen {sicherungen}")
 
 asyncio.run(main())
 EOF
