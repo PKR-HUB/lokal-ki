@@ -22,7 +22,7 @@ LAN :443 → Caddy (tls internal, etc/caddy/Caddyfile)
 - Nur 22 und 443 sind aus 192.168.10.0/24 offen (ufw). Open WebUI läuft im Host-Netz, damit Docker die Firewall nicht umgeht. 3000 und 8080 dürfen nie nach außen gebunden werden.
 - Dateien unter `etc/` spiegeln die Pfade unter `/etc/`. Das jeweilige `scripts/pN-*.sh` installiert sie per `cmp`/`install`, lädt den Dienst neu und ist mehrfach ausführbar.
 - Modell unter `/srv/models/qwen3.8-27b`, llama.cpp unter `/opt/llama.cpp` (Tag fixiert in `scripts/p3-build-llama.sh`, CUDA 13.3, `sm_120a`). Das Open-WebUI-Image ist per Tag und Digest fixiert.
-- Die Open-WebUI-Konfiguration (Modell-Profile `qwen38` / `qwen38-code`, Nutzerrechte, Brave-Key, Standardmodell) liegt in der **Datenbank im Docker-Volume `open-webui`**, nicht im Repo. Änderungen daran sind in SETUP-LOG P5 beschrieben. Vor jedem Eingriff in `webui.db` wird eine Sicherung `data/webui.db.bak-<anlass>` im Volume angelegt, danach wird der Container neu gestartet.
+- Die Open-WebUI-Konfiguration (Modell-Profile Q3.8 Büro `qwen38-buero`, Q3.8 Backoffice `qwen38-backoffice`, Q3.8 Recherche `qwen38-recherche`, Q3.8 None `qwen38` = Standardmodell, `qwen38-code` nur Admin; Nutzerrechte, Brave-Key, Standardmodell) liegt in der **Datenbank im Docker-Volume `open-webui`**, nicht im Repo. Änderungen daran sind in SETUP-LOG P5 beschrieben. Die System-Prompts der Profile liegen als `Büro.md`, `Backoffice.md`, `Recherche.md` im Repo und werden mit `scripts/p5-profile.sh` übernommen. Vor jedem Eingriff in `webui.db` wird eine Sicherung `data/webui.db.bak-<anlass>` im Volume angelegt, danach wird der Container neu gestartet.
 
 ## Häufige Befehle
 
@@ -31,6 +31,7 @@ LAN :443 → Caddy (tls internal, etc/caddy/Caddyfile)
 scripts/p3-llama-service.sh      # llama-server-Unit installieren, Neustart, warten auf /health
 scripts/p4-caddy.sh              # Caddyfile validieren und installieren
 scripts/p4-openwebui.sh          # docker compose up -d, warten auf /health
+scripts/p5-profile.sh            # Modell-Profile aus Büro.md/Backoffice.md/Recherche.md setzen (nur bei Abweichung: Sicherung, Neustart)
 
 # Zustand prüfen
 systemctl status llama-server caddy gpu-powerlimit
