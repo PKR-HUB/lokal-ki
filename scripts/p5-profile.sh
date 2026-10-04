@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 # P5: Modell-Profile in Open WebUI auf den Soll-Zustand setzen (Anweisung-Profile.md). Idempotent.
-# System-Prompts aus Büro.md, Backoffice.md, Recherche.md (Repo-Wurzel). Nach Änderung der Prompts:
+# System-Prompts aus Büro.md, Backoffice.md, Recherche.md, Vorschläge unter dem Chat aus Vorschläge.json
+# (alles in der Repo-Wurzel). Nach Änderung:
 # git pull und erneut ausführen. Nur bei Abweichung: Sicherung data/webui.db.bak-p5-profile,
 # Änderung über Open WebUIs Modell-Klasse, Neustart des Containers, warten auf /health.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-for f in Büro.md Backoffice.md Recherche.md; do
+for f in Büro.md Backoffice.md Recherche.md Vorschläge.json; do
   [ -s "$f" ] || { echo "ABBRUCH: $f fehlt oder ist leer" >&2; exit 1; }
 done
 
 PROMPTS=$(python3 -c '
 import json, sys
-print(json.dumps({k: open(f, encoding="utf-8").read() for k, f in
-      (("buero", "Büro.md"), ("backoffice", "Backoffice.md"), ("recherche", "Recherche.md"))}))')
+d = {k: open(f, encoding="utf-8").read() for k, f in
+     (("buero", "Büro.md"), ("backoffice", "Backoffice.md"), ("recherche", "Recherche.md"))}
+d["vorschlaege"] = json.load(open("Vorschläge.json", encoding="utf-8"))
+print(json.dumps(d))') || { echo "ABBRUCH: Vorschläge.json ist kein gültiges JSON" >&2; exit 1; }
 
 read -r -d '' PY <<'EOF' || true
 import asyncio, json, sqlite3, sys, time
@@ -23,6 +26,7 @@ from open_webui.models.users import Users
 DB = "/app/backend/data/webui.db"
 BAK = "/app/backend/data/webui.db.bak-p5-profile"
 prompts = json.loads(sys.stdin.read())
+VORSCHLAEGE = prompts["vorschlaege"]
 
 # Einstellungen wie Profil qwen38 (SETUP-LOG P5)
 PARAMS = {"temperature": 1.0, "top_p": 0.95, "top_k": 20, "min_p": 0.0,
@@ -53,7 +57,8 @@ def soll_form(mid, name, system, desc):
     if system is not None:
         params["system"] = system
     return dict(id=mid, base_model_id="qwen3.8-27b", name=name, params=params,
-                meta={**META, "description": desc}, is_active=True)
+                meta={**META, "description": desc, "suggestion_prompts": VORSCHLAEGE.get(mid)},
+                is_active=True)
 
 def ist_form(x):
     return dict(id=x.id, base_model_id=x.base_model_id, name=x.name, params=x.params.model_dump(),
@@ -65,7 +70,8 @@ def grants(x):
 async def main():
     con = sqlite3.connect(DB)
     cfg = {k: json.loads(v) for k, v in con.execute(
-        "select key, value from config where key in ('ui.model_order_list', 'ui.default_models')")}
+        "select key, value from config where key in "
+        "('ui.model_order_list', 'ui.default_models', 'ui.prompt_suggestions')")}
     aenderungen = []
     for mid, name, system, desc in SOLL:
         x = await Models.get_model_by_id(mid)
@@ -75,8 +81,9 @@ async def main():
             aenderungen.append(("ändern", mid, soll_form(mid, name, system, desc)))
     order_neu = cfg.get("ui.model_order_list") != ORDER
     default_neu = cfg.get("ui.default_models") != DEFAULT
+    vorschlag_neu = cfg.get("ui.prompt_suggestions") != VORSCHLAEGE["allgemein"]
 
-    if not aenderungen and not order_neu and not default_neu:
+    if not aenderungen and not order_neu and not default_neu and not vorschlag_neu:
         print("UNVERAENDERT")
         return
 
@@ -93,10 +100,11 @@ async def main():
             sys.exit(f"FEHLER beim Speichern von {mid}")
         print(f"{art}: {mid} ({form['name']})")
     now = int(time.time())
-    for key, val, neu in (("ui.model_order_list", ORDER, order_neu), ("ui.default_models", DEFAULT, default_neu)):
+    for key, val, neu in (("ui.model_order_list", ORDER, order_neu), ("ui.default_models", DEFAULT, default_neu),
+                          ("ui.prompt_suggestions", VORSCHLAEGE["allgemein"], vorschlag_neu)):
         if neu:
             con.execute("update config set value = ?, updated_at = ? where key = ?", (json.dumps(val), now, key))
-            print(f"{key} = {json.dumps(val, ensure_ascii=False)}")
+            print(f"{key} = {json.dumps(val, ensure_ascii=False)[:120]}")
     con.commit()
     print("GEAENDERT")
 

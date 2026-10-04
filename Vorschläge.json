@@ -1,0 +1,53 @@
+{
+  "_hinweis": "Vorschläge unter dem Chat-Eingabefeld je Profil. title = zwei Zeilen auf der Kachel, content = Text, der beim Anklicken in das Eingabefeld kommt. 'allgemein' gilt für Profile ohne eigene Liste (z. B. qwen38-code). Übernehmen mit scripts/p5-profile.sh.",
+  "qwen38-buero": [
+    {"title": ["Schadenmeldung", "an die Versicherung entwerfen"],
+     "content": "Entwirf eine Schadenmeldung an unsere Versicherung. Frag mich zuerst nach den Angaben, die du dafür brauchst."},
+    {"title": ["Eingegangenes Schreiben", "zusammenfassen und beantworten"],
+     "content": "Fasse das folgende Schreiben zusammen und schlag eine Antwort vor:\n\n"},
+    {"title": ["Angebot anfragen", "bei einem Handwerker"],
+     "content": "Entwirf eine Angebotsanfrage an einen Handwerker. Frag mich nach Leistung, Ort und gewünschtem Termin."},
+    {"title": ["Eigenen Entwurf", "förmlich überarbeiten"],
+     "content": "Überarbeite meinen Entwurf in Ton, Aufbau und Rechtschreibung, ohne den Inhalt zu ändern:\n\n"}
+  ],
+  "qwen38-backoffice": [
+    {"title": ["Kundenanfrage prüfen", "und offene Punkte finden"],
+     "content": "Prüfe die folgende Kundenanfrage und erstelle die Angebots-Analyse:\n\n"},
+    {"title": ["Tarifzone bestimmen", "für einen Transfer"],
+     "content": "Bestimme die Tarifzone für einen Transfer. Frag mich nach Start- und Zieladresse mit Postleitzahl."},
+    {"title": ["Stundenanmietung", "abrechenbare Stunden berechnen"],
+     "content": "Berechne die abrechenbaren Stunden für eine Stundenanmietung. Frag mich nach Bereitstellung, Ende und Einsatzort."},
+    {"title": ["Kunden-E-Mail", "mit Angebot entwerfen"],
+     "content": "Entwirf eine Kunden-E-Mail mit einem Angebot. Frag mich nach den Eckdaten und den Preisen aus der Preisliste."}
+  ],
+  "qwen38-recherche": [
+    {"title": ["Mitarbeiterschulung", "planen und ausarbeiten"],
+     "content": "Ich möchte eine Mitarbeiterschulung ausarbeiten. Lass uns mit Thema, Teilnehmenden und Lernzielen anfangen."},
+    {"title": ["Unterweisung", "Arbeitssicherheit in der Werkstatt"],
+     "content": "Ich brauche eine Unterweisung zur Arbeitssicherheit in unserer Werkstatt. Kläre mit mir zuerst Zweck, Umfang und Form."},
+    {"title": ["Neue Vorschrift", "was bedeutet sie für uns?"],
+     "content": "Ich möchte wissen, was eine neue Vorschrift für unseren Betrieb bedeutet. Frag mich zuerst, um welche es geht."},
+    {"title": ["Datenschutz", "Aufbewahrungs- und Löschfristen"],
+     "content": "Erstelle eine Übersicht zu Aufbewahrungs- und Löschfristen für Unterlagen im Büro. Kläre zuerst mit mir, welche Unterlagen es betrifft."}
+  ],
+  "qwen38": [
+    {"title": ["Text zusammenfassen", "in wenigen Stichpunkten"],
+     "content": "Fasse den folgenden Text in fünf Stichpunkten zusammen:\n\n"},
+    {"title": ["Übersetzen", "Deutsch und Englisch"],
+     "content": "Übersetze den folgenden Text ins Englische, oder ins Deutsche, falls er englisch ist:\n\n"},
+    {"title": ["Excel-Formel", "erklären oder erstellen"],
+     "content": "Hilf mir bei einer Excel-Formel. Sie soll Folgendes tun:\n\n"},
+    {"title": ["Ideen sammeln", "zu einem Thema"],
+     "content": "Sammle Ideen zu folgendem Thema:\n\n"}
+  ],
+  "allgemein": [
+    {"title": ["Text zusammenfassen", "in wenigen Stichpunkten"],
+     "content": "Fasse den folgenden Text in fünf Stichpunkten zusammen:\n\n"},
+    {"title": ["Übersetzen", "Deutsch und Englisch"],
+     "content": "Übersetze den folgenden Text ins Englische, oder ins Deutsche, falls er englisch ist:\n\n"},
+    {"title": ["Excel-Formel", "erklären oder erstellen"],
+     "content": "Hilf mir bei einer Excel-Formel. Sie soll Folgendes tun:\n\n"},
+    {"title": ["Ideen sammeln", "zu einem Thema"],
+     "content": "Sammle Ideen zu folgendem Thema:\n\n"}
+  ]
+}
