@@ -238,4 +238,6 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 
 P4-Nachtrag: Port-Test vom Admin-PC durch den Admin erledigt ✅ (P4 abgeschlossen).
 
+P4-Nachtrag Root-Zertifikat (2026-10-04, N-SEC-03): `client/caddy-root.crt` auf dem Admin-PC in den Benutzer-Speicher „Vertrauenswürdige Stammzertifizierungsstellen“ installiert (`certutil -user -addstore Root client\caddy-root.crt`, Windows-Sicherheitsabfrage bestätigt; SHA1 `DB0A77036000C3AEE98285DE8B7B53D0A03C8202`, SHA256 wie in P4). Test: `https://192.168.10.129` über den Windows-Trust-Store HTTP 200 ohne Zertifikatsfehler ✅. Gilt für Edge und Chrome nach Browser-Neustart; Firefox nutzt einen eigenen Speicher. Die übrigen Büro-PCs sind noch offen (gleicher Befehl je Nutzer oder per Gruppenrichtlinie). Entfernen: `certutil -user -delstore Root DB0A77036000C3AEE98285DE8B7B53D0A03C8202`.
+
 Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-PC. Server-seitig unauffällig (Link stabil, IP unverändert, keine SSH-Versuche oder ufw-Blocks auf Port 22 im Log), Ursache lag im Büronetz (gleichzeitige Internetstörung, verspätete DNS-Antworten von .9).
