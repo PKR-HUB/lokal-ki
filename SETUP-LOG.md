@@ -267,3 +267,12 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - **P6-A1 – Modell-Klassen statt API** (8.11 Punkt 3): Mit `ENABLE_ADMIN_CHAT_ACCESS=false` darf auch der Admin über die API keine fremden Chats auflisten (`routers/chats.py`). Der Job nutzt deshalb im laufenden Container dieselben Klassen, über die die API-Endpunkte löschen. Das Schema der fixierten Version ist geprüft, SQLite lässt den gleichzeitigen Zugriff zu. Direktes SQL nur zum Lesen, zum Altern der Testdaten und für verwaiste Verknüpfungszeilen.
 - **P6-A2 – Auch Bewertungen und verwaiste Dateien:** Über die PRD hinaus löscht der Job Bewertungen (enthalten Chat-Kopien) und Dateien, deren Chat ein Nutzer schon selbst gelöscht hat, sowie zurückgebliebene Vektor-Sammlungen. Sonst blieben Büro-Daten über die 90 Tage hinaus erhalten.
 - **P6-A3 – Sicherungen nach 90 Tagen löschen:** Auf Entscheidung des Admins, damit keine Chats in DB-Kopien länger als 90 Tage erhalten bleiben. Eingriffe der letzten 90 Tage lassen sich weiter rückgängig machen.
+
+## P7 Übergabe – Beginn 2026-10-04
+
+| Schritt | Ergebnis |
+|---|---|
+| `ADMIN.md` | Betrieb: Konten anlegen (Anmeldename `vorname@localhost`, keine echte E-Mail nötig), Passwort, Konto löschen, Rechte der Nutzer, Profile/Prompts/Vorschläge ändern (`git pull` + `scripts/p5-profile.sh`), Löschung nach 90 Tagen, Zustand prüfen, Neustart, Root-Zertifikat auf Büro-PCs, Pi (verschoben), Abschaltung nach PRD 10 (Volume `ki_open-webui`), Regeln für Claude Code ✅ |
+| `Wartung.md` (Wunsch des Admins) | Technikübersicht mit Versionen und Update-Wegen; monatliche Systemupdates und Aufräumen (`apt autoremove --purge`, `apt clean`, rc-Pakete, Neustart bei `reboot-required`); Hinweis: unattended-upgrades installiert nur `resolute` und `-security`, nicht `-updates` (neue NVIDIA-Treiber meist dort); Open-WebUI-Update mit Digest, Sicherung, Test und Rückrollen (WAL-Dateien beachten); llama.cpp-Update mit Flag-Prüfung und Benchmarks; Modellwechsel; Docker-Aufräumen und verbotene Befehle (`volume prune`, `down -v`); Kontrollplan; Fehlersuche ✅ |
+
+**Offen in P7:** A2 nach dem letzten Stand (Server-Neustart, nur nach Freigabe des Admins), Gesamtübersicht der Abnahmetests.
