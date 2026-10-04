@@ -225,6 +225,7 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 | System-Prompt | Test: Qwen3.8 meldet sich als Büro-Assistent in Sie-Form ✅. Eigener System-Prompt eines Nutzers wird angehängt und befolgt (Test „duzen, mit Moin beginnen“ → befolgt) ✅. Open WebUI setzt den Profil-Prompt vor den Nutzer-Prompt. |
 | Arena-Modell | `evaluation.arena.enable` aus (Blindvergleich ist mit einem Modell sinnlos, verwirrt nur in der Auswahl) ✅ |
 | Websuche Standard an | Admin-Test zeigte „kein Web-Such-Tool“: Chat lief noch mit dem Basismodell (UI merkte sich die alte Auswahl), dort gibt es weder System-Prompt noch Websuche. Behoben: Profil `Qwen3.8` mit `defaultFeatureIds: ["web_search"]` (Websuche in neuen Chats vorausgewählt), Standardmodell für alle `qwen38`, Reihenfolge Qwen3.8 vor qwen38-code. Sicherung `data/webui.db.bak-p5-websearch` ✅ |
+| Hugging Face offline (2026-10-04) | `HF_HUB_OFFLINE=1` in `docker-compose.yml`: Open WebUI fragt beim Start nicht mehr bei Hugging Face nach (bei DNS-Störung zuvor 2+ min Startverzögerung). Embedding-Modelle `all-MiniLM-L6-v2` und `bge-micro-v2` liegen im Volume. Bewusst nicht `OFFLINE_MODE`, weil das auch die pip-Installation für Werkzeuge sperrt. Test: Neustart in 12 s, `/health` ok, Embedding-Modell lädt offline (Dim 384), keine Fehler im Log ✅ |
 
 **Abweichungen P5:**
 - **P5-A1 – API-Schlüssel nur für den Admin** (F-UI-08, F-COD-01, A12): Auf Wunsch des Admins bekommt nur er einen API-Schlüssel. Alle anderen nutzen ausschließlich die Weboberfläche. Die Berechtigung „API Keys“ bleibt in den Standardrechten aus, eine Gruppe „Entwicklung“ wird nicht angelegt. A12 (IDE-Anbindung) wird nur mit dem Admin-Schlüssel geprüft.
@@ -232,7 +233,7 @@ Neustart durch den Admin, Boot 17:33:45 UTC. Ohne manuellen Eingriff:
 - **P5-A3 – A12 verschoben:** IDE-Anbindung wird später geprüft, nicht Voraussetzung für den Abschluss von P5.
 - **P5-A4 – Websuche standardmäßig an** (PRD Risiken: „Websuche nicht als Default“): Auf Wunsch des Admins im Profil Qwen3.8 vorausgewählt, Nutzer können sie pro Chat abschalten. Der System-Prompt verbietet weiterhin Personen-/Kundennamen in Suchanfragen.
 
-**Offen nach heute:** Websuche-Test im Chat mit Profil „Qwen3.8“ (neuer Chat) durch den Admin. Vorschlag `HF_HUB_OFFLINE=1` in `docker-compose.yml` (Open WebUI startete bei DNS-Störung 2+ Minuten langsamer), noch nicht umgesetzt.
+**Offen nach heute:** Websuche-Test im Chat mit Profil „Qwen3.8“ (neuer Chat) durch den Admin. ~~Vorschlag `HF_HUB_OFFLINE=1`~~ umgesetzt am 2026-10-04.
 
 P4-Nachtrag: Port-Test vom Admin-PC durch den Admin erledigt ✅ (P4 abgeschlossen).
 

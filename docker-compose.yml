@@ -34,6 +34,8 @@ services:
       WEB_FETCH_MAX_CONTENT_LENGTH: "20000"
       # Hintergrundlast reduzieren
       ENABLE_AUTOCOMPLETE_GENERATION: "false"
+      # Keine Hugging-Face-Abfragen beim Start (Embedding-Modelle liegen im Volume), P5
+      HF_HUB_OFFLINE: "1"
 
 volumes:
   open-webui:
