@@ -301,4 +301,16 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
 **Monitoring an der Konsole (2026-10-05):** Auf Wunsch des Admins `btop` 1.4.6 und `nvtop` 3.2.0 aus den Ubuntu-Paketquellen installiert. Beide sind reine Terminal-Programme ohne offenen Port, ein Desktop wird nicht installiert. In `~/.config/btop/btop.conf` (Benutzer msb) ist das GPU-Feld eingeblendet (`shown_boxes = "cpu mem net proc gpu0"`). btop erkennt die RTX 5090 über NVML. Die Bedienung steht in `ADMIN.md` Abschnitt 4.
 
+**Netdata (2026-10-05):** Auf Wunsch des Admins Verlaufs-Monitoring im Browser, erreichbar über Caddy statt über einen SSH-Tunnel (Tunnel wird im Alltag erfahrungsgemäß nicht genutzt).
+- Netdata ist nicht mehr in Ubuntu enthalten. Installiert aus dem offiziellen Repo `repo.netdata.cloud` (Suite `resolute/`, Schlüssel Netdatabot `6E15 5DC1 5390 6B73 765A 74A9 9DD4 A74C ECFA 8F4F`, Dateien unter `etc/apt/`), Version 2.12.0. Skript `scripts/p7-netdata.sh`.
+- Ohne die empfohlenen Pakete `netdata-plugin-systemd-journal`, `-journal-viewer` und `-network-viewer`: Das Dashboard soll keine Log-Inhalte (mögliche Büro-Daten) und keine Verbindungsdetails zeigen. `netdata-plugin-systemd-units` ist installiert.
+- Anonyme Statistiken abgeschaltet (`/etc/netdata/.opt-out-from-anonymous-statistics` vor der Installation angelegt). Keine Anmeldung bei Netdata Cloud, keine ausgehenden Verbindungen des Agenten festgestellt. Eigene Registry statt `registry.my-netdata.io`.
+- `etc/netdata/netdata.conf`: Web-Server nur auf `127.0.0.1:19999`, alle Zugriffe nur von localhost. Die mitgelieferten Dienste `statsd` (8125) und `otel-plugin` (4317) lauschen ebenfalls nur auf 127.0.0.1.
+- Caddy: `https://192.168.10.129/netdata/` mit `basicauth` (Benutzer `admin`, bcrypt). Der Hash liegt **nicht** im Repo, sondern in `/etc/caddy/netdata-auth.caddy`, gesetzt mit `sudo scripts/p7-netdata-passwort.sh`. Bis der Admin ein Passwort setzt, steht dort ein Hash eines zufälligen, verworfenen Passworts (Seite gesperrt).
+- Die Netdata-Oberfläche enthält Google Tag Manager und Aufrufe von `app.netdata.cloud`. Caddy setzt dafür eine Content-Security-Policy, die nur Inhalte und Verbindungen zum eigenen Server erlaubt, sowie `Referrer-Policy: no-referrer`.
+- GPU-Daten über den mitgelieferten Sammler `nvidia_smi` (go.d), Container über cgroups (`cgroup_open-webui.*`).
+- Tests: `/` (Open WebUI) 200 und ohne CSP, `/netdata` → 302 auf `/netdata/`, ohne/falsches Passwort 401, mit Passwort 200 (Dashboard und API, 1867 Charts inkl. GPU). Ports: kein neuer Port nach außen, ufw unverändert.
+- **P7-A1:** Netdata ist ein zusätzlicher Dienst mit Fremd-Repo, der in der PRD nicht vorgesehen ist. Begründung: Wunsch des Admins nach grafischem Verlauf. Er läuft nur lokal und ist ausschließlich über den bestehenden Port 443 mit Passwort erreichbar. Netdata-Updates kommen nicht automatisch (siehe `Wartung.md`).
+- Offen: Darstellung im Browser mit CSP vom Admin prüfen (auf dem Server gibt es keinen Browser für einen Test).
+
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).

@@ -8,5 +8,21 @@
 
 https://192.168.10.129 {
 	tls internal
-	reverse_proxy 127.0.0.1:3000
+
+	# Netdata (Monitoring) unter /netdata/, nur mit Passwort (P7).
+	# Der Passwort-Hash liegt nicht im Repo, sondern in /etc/caddy/netdata-auth.caddy
+	# (anlegen/ändern: sudo scripts/p7-netdata-passwort.sh).
+	redir /netdata /netdata/
+	handle_path /netdata/* {
+		import /etc/caddy/netdata-auth.caddy
+		# Die Netdata-Oberfläche enthält Tracking (Google Tag Manager) und Cloud-Aufrufe.
+		# Der Browser darf nur Inhalte vom eigenen Server laden und nur dorthin verbinden.
+		header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-src 'self'; frame-ancestors 'self'; form-action 'self'"
+		header Referrer-Policy no-referrer
+		reverse_proxy 127.0.0.1:19999
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:3000
+	}
 }

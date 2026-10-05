@@ -99,6 +99,12 @@ systemctl --failed
 
 Im Leerlauf belegt das Modell dauerhaft ca. 24,6 GB Grafikspeicher bei fast 0 % GPU-Last. Während einer Antwort geht die GPU-Last auf nahezu 100 % und die Leistung bis 500 W.
 
+### Verlauf im Browser: Netdata
+
+**https://192.168.10.129/netdata/** (Benutzer `admin`, Passwort setzen/ändern am Server mit `sudo /srv/ki/scripts/p7-netdata-passwort.sh`). Zeigt CPU, Speicher, Platten, Netz, Container und GPU (unter „nvidia_smi“) sekundengenau und rückwirkend über Wochen. Den Hinweis auf die Anmeldung bei Netdata Cloud mit „Skip“ bzw. anonym weiter überspringen, ein Konto ist nicht nötig.
+
+Die Seite ist aus dem ganzen Büronetz erreichbar, daher ein eigenes, starkes Passwort verwenden und nicht weitergeben. Chat-Inhalte zeigt Netdata nicht.
+
 ## 5. Neustart
 
 | Was | Befehl | Dauer |

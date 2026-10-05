@@ -21,6 +21,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 | Docker | 29.1.3, Compose 2.40.3 | Ubuntu | mit `apt upgrade` |
 | Open WebUI | v0.11.4, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
 | Caddy | 2.6.2 | Ubuntu | mit `apt upgrade` |
+| Netdata | 2.12.0 | Netdata-Repo (`etc/apt/sources.list.d/netdata.sources`) | mit `apt upgrade` (nicht automatisch) |
 | Firewall, SSH | ufw (22 und 443 aus 192.168.10.0/24), nur Schlüssel-Login | Ubuntu | – |
 
 Dienste und Timer:
@@ -32,6 +33,7 @@ Dienste und Timer:
 | `caddy.service` | HTTPS |
 | `gpu-powerlimit.service` | GPU-Limit 500 W beim Start |
 | `chat-retention.timer` | Löschung nach 90 Tagen, täglich 05:30 |
+| `netdata.service` | Monitoring, 127.0.0.1:19999, über Caddy unter `/netdata/` mit Passwort |
 | `unattended-upgrades` | automatische Sicherheitsupdates |
 
 Wo was liegt:
@@ -75,6 +77,8 @@ systemctl --failed
 ```
 
 **NVIDIA-Treiber:** Kernel-Module und Treiber müssen zusammenpassen. Ubuntu baut die Module passend zum Kernel (`linux-modules-nvidia-595-open-generic`). Nach einem Treiber- oder Kernel-Update meldet `nvidia-smi` bis zum Neustart „Driver/library version mismatch“, das ist normal. Kein `.run`-Installer von nvidia.com verwenden. Ein Wechsel auf einen anderen Treiberzweig (z. B. 610) ist ein eigenes Vorhaben mit Test (A1, A3, A4, A14).
+
+**Netdata** kommt aus dem eigenen Repo von Netdata und wird von `unattended-upgrades` nicht erfasst, nur vom monatlichen `apt upgrade`. Nach einem Update prüfen: `sudo ss -tlnp | grep 19999` muss `127.0.0.1` zeigen, die Seite `/netdata/` muss nach Passwort fragen. Einstellungen stehen in `etc/netdata/netdata.conf`, installiert von `scripts/p7-netdata.sh`. Der Netdata-eigene Updater wird nicht verwendet.
 
 **Nicht mit `apt upgrade` verändern:** `cuda-toolkit-13-3` ist gehalten (`apt-mark showhold`). Das NVIDIA-Repo hat Priorität 100, Treiber kommen dadurch weiter von Ubuntu (`etc/apt/preferences.d/nvidia-cuda-repo`).
 

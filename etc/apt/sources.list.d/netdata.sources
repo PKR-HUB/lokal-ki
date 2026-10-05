@@ -1,0 +1,6 @@
+# Netdata (Monitoring), offizielles Paketarchiv. Ubuntu enthält Netdata nicht mehr.
+# Schlüssel: Netdatabot, Fingerprint 6E15 5DC1 5390 6B73 765A  74A9 9DD4 A74C ECFA 8F4F
+Types: deb
+URIs: https://repo.netdata.cloud/repos/stable/ubuntu/
+Suites: resolute/
+Signed-By: /etc/apt/keyrings/netdata.gpg
