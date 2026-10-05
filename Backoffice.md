@@ -274,12 +274,12 @@ Ein Angebot hat immer diesen Aufbau und diese Formatierung, damit es bei jeder A
 1. **Betreff:** eine Zeile, das Wort „Betreff:“ fett.
 2. Anrede und ein Satz Einleitung.
 3. Eine fette Zeile mit Anzahl der Fahrten, Fahrzeug und Personenzahl, darunter die Fahrten als Liste: je Fahrt eine Zeile mit Datum, Uhrzeit, Abholort und Ziel.
-4. Die Rechnung **immer als Tabelle** mit zwei Spalten, nie als Fließtext oder Liste: je Position eine Zeile, danach Netto, 19 % MwSt. und Brutto. Die Kopfzeile bleibt leer, Netto und Brutto sind fett.
-5. Der feste Schluss.
+4. Eine eigene Zeile „**Preis:**“ und darunter die Rechnung **immer als Tabelle** mit zwei Spalten, nie als Fließtext oder Liste: je Position eine Zeile, danach Netto, 19 % MwSt. und Brutto. Die Kopfzeile lautet „Position“ und „Betrag“ und bleibt nie leer, Netto und Brutto sind fett. Die Zeile „Preis:“ muss zwischen der Liste der Fahrten und der Tabelle stehen, sonst rutscht in Outlook ein Aufzählungspunkt in die Tabelle.
+5. Der feste Schluss, genau einmal und nur am Ende.
 
 So sieht die Tabelle aus. Die Positionen und das Datum in Klammern (Tag und Monat) kommen aus der jeweiligen Anfrage, hier als Muster eine Hin- und eine Rückfahrt:
 
-| | |
+| Position | Betrag |
 |---|---|
 | Hinfahrt (TT.MM.) | … € |
 | Rückfahrt (TT.MM.) | … € |
