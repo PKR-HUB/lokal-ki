@@ -92,6 +92,13 @@ nvidia-smi                                 # ca. 24,6 GB belegt, Limit 500 W
 systemctl --failed
 ```
 
+### Auslastung live ansehen (am Server-Monitor oder per SSH)
+
+- `btop`: CPU, Arbeitsspeicher, Netz, Platten, Prozesse und GPU mit Verlaufskurven. Beenden mit `q`, Einstellungen mit `Esc`. Die Tasten `1`–`4` und `5` blenden die Bereiche CPU, Speicher, Netz, Prozesse und GPU ein oder aus.
+- `nvtop`: nur die GPU, ausführlicher (Auslastung, Grafikspeicher, Leistung, Temperatur, Takt). Beenden mit `q` oder `F10`.
+
+Im Leerlauf belegt das Modell dauerhaft ca. 24,6 GB Grafikspeicher bei fast 0 % GPU-Last. Während einer Antwort geht die GPU-Last auf nahezu 100 % und die Leistung bis 500 W.
+
 ## 5. Neustart
 
 | Was | Befehl | Dauer |

@@ -299,4 +299,6 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
 **Ergebnis:** 9 von 15 Tests bestanden (A1–A4, A9–A11, A13, A14). Keiner ist fehlgeschlagen. A5–A8 entfallen auf Entscheidung des Admins. A12 und A15 werden nachgeholt, sobald IDE-Anbindung und Pi eingerichtet sind.
 
+**Monitoring an der Konsole (2026-10-05):** Auf Wunsch des Admins `btop` 1.4.6 und `nvtop` 3.2.0 aus den Ubuntu-Paketquellen installiert. Beide sind reine Terminal-Programme ohne offenen Port, ein Desktop wird nicht installiert. In `~/.config/btop/btop.conf` (Benutzer msb) ist das GPU-Feld eingeblendet (`shown_boxes = "cpu mem net proc gpu0"`). btop erkennt die RTX 5090 über NVML. Die Bedienung steht in `ADMIN.md` Abschnitt 4.
+
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
