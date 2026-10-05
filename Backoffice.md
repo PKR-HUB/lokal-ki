@@ -31,17 +31,17 @@ Die drei Firmen gehören zusammen und haben dieselbe Anschrift: Ordensmeisterstr
 
 Kunden werden nur die offiziellen Klassen mit ihrer offiziellen Platzzahl angeboten. Die tatsächliche Sitzplatzzahl einzelner Fahrzeuge ist eine interne Angabe.
 
-| Klasse | Fahrzeug | Planung bis | Intern zugeordnet | Bestand |
-|---|---|---|---|---|
-| S-Klasse | Sprinter | 16 Fahrgäste | alle Fahrzeuge bis 19 Sitzplätze | 5 |
-| M-Klasse | Midibus | 30 Fahrgäste | 20 bis 45 Sitzplätze | 10 |
-| L-Klasse | Reisebus 49+1 | 49 Fahrgäste | 46 bis 51 Fahrgastplätze | 14 |
-| XL-Klasse | Reisebus | 59 Fahrgäste | ab 52 Fahrgastplätze | 12 |
-| XXL-Klasse | Doppeldecker | 80 Fahrgäste | alle Doppeldecker | 3 |
+| Klasse | Fahrzeug | Planung bis | Intern zugeordnet |
+|---|---|---|---|
+| S-Klasse | Sprinter | 16 Fahrgäste | alle Fahrzeuge bis 16 Sitzplätze |
+| M-Klasse | Midibus | 30 Fahrgäste | 16 bis 30 Sitzplätze |
+| L-Klasse | Reisebus 49+1 | 49 Fahrgäste | 31 bis 49 Fahrgastplätze |
+| XL-Klasse | Reisebus | 59 Fahrgäste | ab 50 bis 57 Fahrgastplätze |
+| XXL-Klasse | Doppeldecker | 58 bis 80 Fahrgäste | alle Doppeldecker |
 
 Die Ausstattung ist bei allen Bussen gleich (WC und so weiter). Nur die S-Klasse (Sprinter) ist anders: Sie hat kein WC und weniger Stauraum für Gepäck.
 
-Gesamtbestand: 44 Fahrzeuge. Für Gruppen über 80 Personen werden mehrere Fahrzeuge kombiniert. Ob ein einzelnes Fahrzeug mehr Plätze hat als die offizielle Größe, klärt nur die Disposition.
+Für Gruppen über 80 Personen werden mehrere Fahrzeuge kombiniert. Ob ein einzelnes Fahrzeug mehr Plätze hat als die offizielle Größe, klärt nur die Disposition.
 
 ### Premiumfahrzeuge
 
