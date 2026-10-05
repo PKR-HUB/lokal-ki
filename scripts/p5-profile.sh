@@ -51,13 +51,17 @@ SOLL = [
 ]
 ORDER = ["qwen38-buero", "qwen38-backoffice", "qwen38-recherche", "qwen38", "qwen38-code"]
 DEFAULT = "qwen38"
+# Knöpfe unter der Antwort (Action-Funktionen, installiert mit scripts/p5-action-outlook.sh)
+ACTIONS = {"qwen38-backoffice": ["outlook_kopieren"]}
 
 def soll_form(mid, name, system, desc):
     params = dict(PARAMS)
     if system is not None:
         params["system"] = system
-    return dict(id=mid, base_model_id="qwen3.8-27b", name=name, params=params,
-                meta={**META, "description": desc, "suggestion_prompts": VORSCHLAEGE.get(mid)},
+    meta = {**META, "description": desc, "suggestion_prompts": VORSCHLAEGE.get(mid)}
+    if mid in ACTIONS:
+        meta["actionIds"] = ACTIONS[mid]
+    return dict(id=mid, base_model_id="qwen3.8-27b", name=name, params=params, meta=meta,
                 is_active=True)
 
 def ist_form(x):
