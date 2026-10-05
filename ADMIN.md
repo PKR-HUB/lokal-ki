@@ -65,6 +65,8 @@ Die Vorschläge unter dem Eingabefeld stehen in `Vorschläge.json`.
    Das Skript ändert nur, was abweicht. Dann legt es eine Sicherung an, startet Open WebUI neu (ca. 15 s Unterbrechung) und wartet, bis es wieder läuft. Ist nichts zu ändern, meldet es „nichts geändert“.
 3. Im Browser die Seite neu laden. Bestehende Chats behalten ihr Profil, neue Chats nutzen den neuen Prompt.
 
+Der Kopieren-Knopf unter einer Antwort kopiert formatierten Text (Fettdruck, Tabellen bleiben in Outlook erhalten). Das ist für alle Konten voreingestellt (`scripts/p5-kopieren.sh`). Wer es unter Einstellungen → Oberfläche ausschaltet, bekommt beim nächsten Lauf des Skripts wieder „an“.
+
 Profile nicht in der Oberfläche bearbeiten: Der nächste Lauf von `p5-profile.sh` überschreibt Änderungen an den vier Q3.8-Profilen.
 
 ## 3. Automatische Löschung (90 Tage)

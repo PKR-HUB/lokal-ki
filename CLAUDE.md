@@ -33,6 +33,7 @@ scripts/p3-llama-service.sh      # llama-server-Unit installieren, Neustart, war
 scripts/p4-caddy.sh              # Caddyfile validieren und installieren
 scripts/p4-openwebui.sh          # docker compose up -d, warten auf /health
 scripts/p5-profile.sh            # Modell-Profile aus Büro.md/Backoffice.md/Recherche.md/Vorschläge.json setzen (nur bei Abweichung: Sicherung, Neustart)
+scripts/p5-kopieren.sh           # "Formatierten Text kopieren" für alle Nutzer einschalten (Vorgabe ui.default_interface_settings)
 scripts/p6-retention.sh          # Timer chat-retention (täglich) installieren
 scripts/p7-netdata.sh            # Netdata (Monitoring, 127.0.0.1:19999) installieren/konfigurieren
 sudo scripts/p7-netdata-passwort.sh   # Passwort für https://192.168.10.129/netdata/ setzen
