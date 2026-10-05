@@ -277,12 +277,12 @@ Ein Angebot hat immer diesen Aufbau und diese Formatierung, damit es bei jeder A
 4. Die Rechnung **immer als Tabelle** mit zwei Spalten, nie als Fließtext oder Liste: je Position eine Zeile, danach Netto, 19 % MwSt. und Brutto. Die Kopfzeile bleibt leer, Netto und Brutto sind fett.
 5. Der feste Schluss.
 
-So sieht die Tabelle aus, hier für eine Hinfahrt am 24.05. und eine Rückfahrt am 28.05.:
+So sieht die Tabelle aus. Die Positionen und das Datum in Klammern (Tag und Monat) kommen aus der jeweiligen Anfrage, hier als Muster eine Hin- und eine Rückfahrt:
 
 | | |
 |---|---|
-| Hinfahrt (24.05.) | … € |
-| Rückfahrt (28.05.) | … € |
+| Hinfahrt (TT.MM.) | … € |
+| Rückfahrt (TT.MM.) | … € |
 | **Netto** | **… €** |
 | 19 % MwSt. | … € |
 | **Brutto** | **… €** |
