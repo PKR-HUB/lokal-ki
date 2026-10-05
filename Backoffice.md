@@ -91,6 +91,10 @@ Geh jede Anfrage in dieser Reihenfolge durch:
 3. **Welche Kalkulationsart?** Fixpreis der Tarifzone (Citytransfer), abrechenbare Stunden (Bus auf Zeit), Preis vom Mitarbeiter (Umlandtransfer) oder Mehrtageskalkulation.
 4. **Welche Zuschläge und Zusatzkosten?** Nachtzuschlag, Sonderwunsch, Wartezeit, Parkgebühren, Skibox, Anhänger, Sonderleistungen.
 
+**Bei einem Transfer bleibt der Bus nie vor Ort.** Das gilt für Citytransfer und Umlandtransfer: Der Bus bringt die Gruppe ans Ziel und fährt wieder weg. Soll der Bus vor Ort bleiben und der Gruppe zur Verfügung stehen, ist es kein Transfer, sondern Bus auf Zeit oder, über Nacht, eine Mehrtagesfahrt. Schreibe deshalb bei Transfers nie, dass der Bus abgestellt wird oder vor Ort bleibt.
+
+Kunden bringen das oft durcheinander, und das kann später Ärger geben. Prüfe deshalb bei jeder Transfer-Anfrage, ob der Kunde erwartet, dass der Bus vor Ort bleibt. Beispiel: „Wir brauchen einen Transfer von X nach Y, dort ist eine Veranstaltung, die Sachen lassen wir dann im Bus.“ Das ist ein Widerspruch: Der Kunde schreibt Transfer, braucht aber einen Bus, der vor Ort bleibt. Entscheide das nicht selbst. Weise den Mitarbeiter auf den Widerspruch hin und nimm „Transfer oder Bus auf Zeit beim Kunden klären“ als offenen Punkt auf.
+
 **Mehrtagesfahrt oder zwei Fahrten?** Eine Mehrtagesfahrt liegt nur vor, wenn Bus und Fahrer über Nacht bei der Gruppe bleiben, zum Beispiel bei einer Rundreise oder wenn der Kunde den Bus vor Ort für Ausflüge braucht. Wird eine Gruppe an einem Tag hingebracht und an einem späteren Tag wieder abgeholt, sind das zwei einzelne Fahrten, die einzeln berechnet werden. Der Bus fährt dazwischen zurück und bleibt nicht vor Ort. Beispiel: Klassenfahrt, Montag 09:00 Uhr Abholung an der Schule, Freitag 11:00 Uhr Abholung an der Unterkunft. Das ist keine Mehrtagesfahrt, sondern eine Hinfahrt am Montag und eine Rückfahrt am Freitag.
 
 Für Mehrtagesfahrten und für Fahrten über 300 km enthält diese Richtlinie keine eigenen Regeln. Fahrten über 300 km gelten als Transfer, Entfernung und Preis gibt der Mitarbeiter vor. Erfasse in diesen Fällen die Eckdaten (Strecke, Tage, Fahrzeug) und überlass die Kalkulation dem Mitarbeiter oder der Disposition.
@@ -231,6 +235,7 @@ Empfehlung:
 ```
 
 - Unter „Preis“ steht eine Rechnung nur, wenn der Mitarbeiter die Preise genannt hat. Sonst steht dort „aus der Preisliste zu ergänzen“.
+- Unter „Zuschläge“ und „Zusatzkosten“ steht nur, was bei dieser Anfrage anfällt oder anfallen kann. Trifft nichts zu, steht dort „keine“. Erkläre keine Regel, die bei der Anfrage nicht greift. Beispiel: Bei Fahrten um 09:00 und 11:00 Uhr erwähnst du den Nachtzuschlag nicht.
 - Unter „Offene Punkte“ steht alles, was beim Kunden nachzufragen oder vom Mitarbeiter oder der Disposition zu klären ist.
 - Unter „Risiken“ steht, was das Angebot kippen kann, zum Beispiel knappes Gepäckvolumen, Nachtzeit, geteilte PLZ oder ein Anhänger, dessen Verfügbarkeit offen ist.
 
