@@ -23,6 +23,8 @@ services:
       OPENAI_API_KEY: "none"
       # Privatsphäre
       ENABLE_ADMIN_CHAT_ACCESS: "false"
+      # Oberfläche auf Deutsch für alle, die noch keine eigene Sprache gewählt haben (P7)
+      DEFAULT_LOCALE: "de-DE"
       # Native / Agentic Function Calling als Standard
       DEFAULT_MODEL_PARAMS: '{"function_calling":"native"}'
       # Websuche: Brave

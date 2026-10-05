@@ -40,6 +40,8 @@ Admin-Bereich → Benutzer → Konto löschen. Die Chats des Kontos werden dabei
 
 Der Admin sieht keine fremden Chats (`ENABLE_ADMIN_CHAT_ACCESS=false`).
 
+Die Oberfläche ist für alle auf Deutsch voreingestellt (`DEFAULT_LOCALE` in `docker-compose.yml`). Jeder kann unter Einstellungen → Allgemein → Sprache selbst umstellen, das gilt dann nur in seinem Browser.
+
 ## 2. Modell-Profile, System-Prompts, Vorschläge
 
 | Profil | Zweck | Prompt-Datei |

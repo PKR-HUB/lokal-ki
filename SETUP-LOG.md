@@ -313,4 +313,9 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - **P7-A1:** Netdata ist ein zusätzlicher Dienst mit Fremd-Repo, der in der PRD nicht vorgesehen ist. Begründung: Wunsch des Admins nach grafischem Verlauf. Er läuft nur lokal und ist ausschließlich über den bestehenden Port 443 mit Passwort erreichbar. Netdata-Updates kommen nicht automatisch (siehe `Wartung.md`).
 - Browsertest (2026-10-05): Die Startseite von Netdata lädt die Oberfläche von app.netdata.cloud nach (durch die CSP blockiert, nur Anmeldeseite ohne Graphen). Caddy leitet `/netdata` und `/netdata/` deshalb auf `/netdata/v3/` um, dort liegt dieselbe Oberfläche lokal und mit abgeschaltetem Tracking. Danach vom Admin im Browser bestätigt: Graphen sichtbar ✅.
 
+### Oberflächensprache Deutsch – 2026-10-05
+
+- `docker-compose.yml`: `DEFAULT_LOCALE: "de-DE"` (Open WebUI v0.11.4, über `/api/config` als `default_locale` an den Browser). Ausgerollt mit `scripts/p4-openwebui.sh`, `/health` ok, `/api/config` liefert `de-DE`.
+- Wirkung: Gilt für jeden Browser, in dem noch keine Sprache gewählt wurde (sonst bisher Browsersprache). Wer unter Einstellungen → Allgemein → Sprache selbst etwas gewählt hat, behält das (im Browser gespeichert) und kann jederzeit umstellen.
+
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
