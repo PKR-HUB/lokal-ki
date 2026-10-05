@@ -277,4 +277,26 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
 | A2 Server-Neustart (2026-10-05) | Neustart durch den Admin, Boot 07:17:21 UTC, alle Dienste nach ca. 10 s aktiv, ohne manuellen Eingriff: llama-server active, `/health` ok, Modell geladen (VRAM 24.628 MiB), Testanfrage beantwortet ✅; Open WebUI `healthy`, `/health` ok ✅; Caddy `https://192.168.10.129` HTTP 200 ✅; gpu-powerlimit 500 W ✅; `chat-retention.timer` geplant (nächster Lauf 06.10. 03:33 UTC) ✅; ufw aktiv (nur 22 und 443 aus 192.168.10.0/24), Passwort-Login aus, unattended-upgrades aktiv ✅; Ports nach außen nur 22 und 443, 3000/8080/2019 nur auf 127.0.0.1 ✅. Keine fehlgeschlagenen Units. **A2 bestanden** |
 
-**Offen in P7:** Gesamtübersicht der Abnahmetests.
+### Gesamtübersicht der Abnahmetests (PRD 11) – Stand 2026-10-05
+
+| # | Test | Ergebnis | Nachweis |
+|---|---|---|---|
+| A1 | `nvidia-smi` nach Neustart | ✅ bestanden, RTX 5090 erkannt; Limit 500 W statt 400 W (P3-A6), nach dem Neustart am 2026-10-05 erneut 500 W | P2, P3-A6, A2 (2026-10-05) |
+| A2 | Server-Neustart | ✅ bestanden (2026-10-03 und 2026-10-05) | A2, P7 |
+| A3 | Leistung 1 Anfrage | ✅ bestanden, 118–148 Token/s, ≤ 21,2 s (400 W und 500 W) | P3 |
+| A4 | 2 parallele Anfragen | ✅ bestanden, je 98–124 Token/s, 3. Anfrage wartet und wird beantwortet | P3 |
+| A5 | Bild/Scan (Rechnung) | – entfällt (P5-A7), Vision eingerichtet | P5 |
+| A6 | PDF mit ca. 20 Seiten | – entfällt (P5-A7) | P5 |
+| A7 | Websuche | – entfällt (P5-A7), Websuche eingerichtet | P5 |
+| A8 | Ungültiger Brave-Key | – entfällt (P5-A7) | P5 |
+| A9 | Zwei Nutzer | ✅ bestanden (Browsertest durch den Admin) | P5 |
+| A10 | Registrierung ohne Admin | ✅ bestanden (HTTP 403) | P5 |
+| A11 | Port-Scan aus dem LAN | ✅ bestanden: 22 und 443 offen, 3000/8080 zu; 22 aus dem ganzen Büronetz, nur per Schlüssel (P1-A1) | P1, P4-Nachtrag, A2 (2026-10-05) |
+| A12 | IDE-Anbindung | ⏳ verschoben (P5-A3), nur mit Admin-Schlüssel (P5-A1) | P5 |
+| A13 | Löschung nach 90 Tagen | ✅ bestanden | P6 |
+| A14 | VRAM unter Last | ✅ bestanden: in P3 24.676 MiB bei 2 × 54k; mit dem heutigen Kontext 2 × 64k (`-c 131072`) 24.628 MiB nach dem Neustart, KV-Cache wird beim Start komplett reserviert | P3, P5, A2 (2026-10-05) |
+| A15 | Pi auf Arbeitsplatz-Rechner | ⏳ verschoben mit Pi (P5-A2) | P5 |
+
+**Ergebnis:** 9 von 15 Tests bestanden (A1–A4, A9–A11, A13, A14). Keiner ist fehlgeschlagen. A5–A8 entfallen auf Entscheidung des Admins. A12 und A15 werden nachgeholt, sobald IDE-Anbindung und Pi eingerichtet sind.
+
+**Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
