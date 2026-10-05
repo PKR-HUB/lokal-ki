@@ -12,7 +12,10 @@ https://192.168.10.129 {
 	# Netdata (Monitoring) unter /netdata/, nur mit Passwort (P7).
 	# Der Passwort-Hash liegt nicht im Repo, sondern in /etc/caddy/netdata-auth.caddy
 	# (anlegen/ändern: sudo scripts/p7-netdata-passwort.sh).
-	redir /netdata /netdata/
+	redir /netdata /netdata/v3/
+	# Die Startseite von Netdata lädt die Oberfläche von app.netdata.cloud (durch die CSP
+	# blockiert). Unter /v3/ liegt dieselbe Oberfläche lokal und ohne Tracking.
+	redir /netdata/ /netdata/v3/
 	handle_path /netdata/* {
 		import /etc/caddy/netdata-auth.caddy
 		# Die Netdata-Oberfläche enthält Tracking (Google Tag Manager) und Cloud-Aufrufe.
