@@ -67,7 +67,7 @@ Die Vorschläge unter dem Eingabefeld stehen in `Vorschläge.json`.
 
 Der Kopieren-Knopf unter einer Antwort kopiert formatierten Text (Fettdruck, Tabellen bleiben in Outlook erhalten). Das ist für alle Konten voreingestellt (`scripts/p5-kopieren.sh`). Wer es unter Einstellungen → Oberfläche ausschaltet, bekommt beim nächsten Lauf des Skripts wieder „an“.
 
-Unter Antworten von Q3.8 Backoffice gibt es zusätzlich den Knopf **„Für Outlook kopieren“** (Briefumschlag). Er kopiert die Antwort so, dass die Preistabelle in Outlook nur so breit ist wie ihr Inhalt. Code: `owui/actions/outlook-kopieren.py`, nach Änderung `scripts/p5-action-outlook.sh` ausführen.
+Unter Antworten von Q3.8 Backoffice gibt es zusätzlich den Knopf **„Für Outlook kopieren“** (Briefumschlag). Er kopiert die Antwort als formatierten Text für Outlook; Tabellen sind dort nur so breit wie ihr Inhalt (das Angebot selbst enthält seit 2ce3fc6 keine Tabelle mehr). Code: `owui/actions/outlook-kopieren.py`, nach Änderung `scripts/p5-action-outlook.sh` ausführen.
 
 Profile nicht in der Oberfläche bearbeiten: Der nächste Lauf von `p5-profile.sh` überschreibt Änderungen an den vier Q3.8-Profilen.
 
