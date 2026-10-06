@@ -1,0 +1,13 @@
+/* Open WebUI: Knöpfe unter der Antwort ausblenden, auch für Admins (P5, Knöpfe ausgeblendet).
+   Wird von Caddy als /static/custom.css ausgeliefert (index.html von Open WebUI lädt die Datei).
+   Selektoren gelten für Open WebUI v0.11.4 (ResponseMessage.svelte); bei Updates prüfen. */
+
+/* Vorlesen */
+button[id^="speak-button-"] {
+	display: none !important;
+}
+
+/* Antwort fortsetzen */
+#continue-response-button {
+	display: none !important;
+}

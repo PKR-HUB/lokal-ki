@@ -30,7 +30,7 @@ LAN :443 → Caddy (tls internal, etc/caddy/Caddyfile)
 ```bash
 # Konfiguration nach Änderung in etc/ ausrollen (idempotent)
 scripts/p3-llama-service.sh      # llama-server-Unit installieren, Neustart, warten auf /health
-scripts/p4-caddy.sh              # Caddyfile validieren und installieren
+scripts/p4-caddy.sh              # Caddyfile und owui/custom.css (Knöpfe auch für Admins aus) installieren
 scripts/p4-openwebui.sh          # docker compose up -d, warten auf /health
 scripts/p5-profile.sh            # Modell-Profile aus Büro.md/Backoffice.md/Recherche.md/Vorschläge.json setzen (nur bei Abweichung: Sicherung, Neustart)
 scripts/p5-kopieren.sh           # "Formatierten Text kopieren" für alle Nutzer einschalten (Vorgabe ui.default_interface_settings)

@@ -3,6 +3,13 @@
 set -euo pipefail
 SRC="$(dirname "$(readlink -f "$0")")/../etc/caddy/Caddyfile"
 DST=/etc/caddy/Caddyfile
+CSS_SRC="$(dirname "$(readlink -f "$0")")/../etc/caddy/owui/custom.css"
+CSS_DST=/etc/caddy/owui/custom.css
+# Stylesheet für Open WebUI (wird ohne Neuladen sofort ausgeliefert)
+if ! sudo cmp -s "$CSS_SRC" "$CSS_DST"; then
+  sudo install -D -m 644 "$CSS_SRC" "$CSS_DST"
+  echo "caddy: owui/custom.css installiert"
+fi
 caddy validate --adapter caddyfile --config "$SRC" >/dev/null
 if ! sudo cmp -s "$SRC" "$DST"; then
   [ -e "$DST.orig" ] || sudo cp -a "$DST" "$DST.orig"
