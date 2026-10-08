@@ -12,10 +12,21 @@ https://192.168.10.129 {
 	# Netdata (Monitoring) unter /netdata/, nur mit Passwort (P7).
 	# Der Passwort-Hash liegt nicht im Repo, sondern in /etc/caddy/netdata-auth.caddy
 	# (anlegen/ändern: sudo scripts/p7-netdata-passwort.sh).
-	redir /netdata /netdata/v3/
-	# Die Startseite von Netdata lädt die Oberfläche von app.netdata.cloud (durch die CSP
-	# blockiert). Unter /v3/ liegt dieselbe Oberfläche lokal und ohne Tracking.
-	redir /netdata/ /netdata/v3/
+	# Einstieg ist die eigene GPU-Übersicht (Quelle etc/caddy/netdata-gpu/index.html).
+	# Die volle Netdata-Oberfläche liegt unter /netdata/v3/: Die Startseite von Netdata lädt
+	# die Oberfläche von app.netdata.cloud (durch die CSP blockiert), unter /v3/ liegt dieselbe
+	# Oberfläche lokal und ohne Tracking.
+	redir /netdata /netdata/gpu/
+	redir /netdata/ /netdata/gpu/
+	redir /netdata/gpu /netdata/gpu/
+	handle_path /netdata/gpu/* {
+		import /etc/caddy/netdata-auth.caddy
+		header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'self'; form-action 'self'"
+		header Referrer-Policy no-referrer
+		header Cache-Control no-cache
+		root * /etc/caddy/netdata-gpu
+		file_server
+	}
 	handle_path /netdata/* {
 		import /etc/caddy/netdata-auth.caddy
 		# Die Netdata-Oberfläche enthält Tracking (Google Tag Manager) und Cloud-Aufrufe.

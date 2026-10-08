@@ -17,7 +17,7 @@ LAN :443 → Caddy (tls internal, etc/caddy/Caddyfile)
          → Open WebUI 127.0.0.1:3000 (Docker, network_mode: host, docker-compose.yml)
          → llama-server 127.0.0.1:8080 (systemd, User llm, etc/systemd/system/llama-server.service)
            Qwen3.8-27B UD-Q4_K_XL + mmproj (Vision) + MTP, 2 Slots, 128k Kontext
-          /netdata/ → Netdata 127.0.0.1:19999 (Monitoring, basicauth, Hash in /etc/caddy/netdata-auth.caddy)
+          /netdata/ → GPU-Übersicht /netdata/gpu/ (etc/caddy/netdata-gpu), volle Oberfläche /netdata/v3/ → Netdata 127.0.0.1:19999 (basicauth, Hash in /etc/caddy/netdata-auth.caddy)
 ```
 
 - Nur 22 und 443 sind aus 192.168.10.0/24 offen (ufw). Open WebUI läuft im Host-Netz, damit Docker die Firewall nicht umgeht. 3000, 8080 und 19999 (Netdata) dürfen nie nach außen gebunden werden.
@@ -30,7 +30,7 @@ LAN :443 → Caddy (tls internal, etc/caddy/Caddyfile)
 ```bash
 # Konfiguration nach Änderung in etc/ ausrollen (idempotent)
 scripts/p3-llama-service.sh      # llama-server-Unit installieren, Neustart, warten auf /health
-scripts/p4-caddy.sh              # Caddyfile und owui/custom.css (Knöpfe auch für Admins aus) installieren
+scripts/p4-caddy.sh              # Caddyfile, owui/custom.css (Knöpfe auch für Admins aus) und GPU-Übersicht installieren
 scripts/p4-openwebui.sh          # docker compose up -d, warten auf /health
 scripts/p5-profile.sh            # Modell-Profile aus Büro.md/Backoffice.md/Recherche.md/Vorschläge.json setzen (nur bei Abweichung: Sicherung, Neustart)
 scripts/p5-kopieren.sh           # "Formatierten Text kopieren" für alle Nutzer einschalten (Vorgabe ui.default_interface_settings)

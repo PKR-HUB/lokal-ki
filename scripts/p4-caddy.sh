@@ -10,6 +10,13 @@ if ! sudo cmp -s "$CSS_SRC" "$CSS_DST"; then
   sudo install -D -m 644 "$CSS_SRC" "$CSS_DST"
   echo "caddy: owui/custom.css installiert"
 fi
+# GPU-Übersicht unter /netdata/gpu/ (P7)
+GPU_SRC="$(dirname "$(readlink -f "$0")")/../etc/caddy/netdata-gpu/index.html"
+GPU_DST=/etc/caddy/netdata-gpu/index.html
+if ! sudo cmp -s "$GPU_SRC" "$GPU_DST"; then
+  sudo install -D -m 644 "$GPU_SRC" "$GPU_DST"
+  echo "caddy: netdata-gpu/index.html installiert"
+fi
 caddy validate --adapter caddyfile --config "$SRC" >/dev/null
 if ! sudo cmp -s "$SRC" "$DST"; then
   [ -e "$DST.orig" ] || sudo cp -a "$DST" "$DST.orig"

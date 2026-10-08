@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KI-Server GPU</title>
+<!-- GPU-Übersicht für den KI-Server (P7). Daten aus Netdata (/netdata/api/v3/data),
+     ohne externe Bibliotheken. Quelle: etc/caddy/netdata-gpu/index.html -->
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --text: #1b1f24; --muted: #5f6b7a; --grid: #e3e6ea;
+  --line: #2f6fdf; --fill: rgba(47,111,223,.12); --warn: #d9480f; --border: #dde1e6;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418; --card: #1a1f25; --text: #e6e9ed; --muted: #95a1af; --grid: #2a3139;
+    --line: #6ea2ff; --fill: rgba(110,162,255,.16); --warn: #ff8a50; --border: #2a3139;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+h1 { font-size: 20px; margin: 0; }
+.ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ctl button { background: var(--card); color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 10px; font: inherit; cursor: pointer; }
+.ctl button[aria-pressed="true"] { background: var(--line); border-color: var(--line); color: #fff; }
+.ctl a { color: var(--line); margin-left: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile, .chart { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+.tile .k { color: var(--muted); font-size: 13px; }
+.tile .v { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tile .s { color: var(--muted); font-size: 12px; }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; }
+.chart h2 { font-size: 14px; font-weight: 600; margin: 0 0 6px; display: flex; justify-content: space-between; }
+.chart h2 span { color: var(--muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+canvas { width: 100%; height: 160px; display: block; }
+#fehler { color: var(--warn); margin: 0 0 12px; }
+footer { color: var(--muted); font-size: 12px; margin-top: 16px; }
+@media (max-width: 400px) { .charts { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>KI-Server · GPU</h1>
+  <div class="ctl" id="bereich">
+    <button data-s="900">15 min</button>
+    <button data-s="3600" aria-pressed="true">1 h</button>
+    <button data-s="21600">6 h</button>
+    <button data-s="86400">24 h</button>
+    <button data-s="604800">7 Tage</button>
+    <a href="/netdata/v3/">Alle Metriken (Netdata)</a>
+  </div>
+</header>
+<p id="fehler" hidden></p>
+<section class="tiles">
+  <div class="tile"><div class="k">GPU-Auslastung</div><div class="v" id="t-util">–</div><div class="s">&nbsp;</div></div>
+  <div class="tile"><div class="k">VRAM belegt</div><div class="v" id="t-vram">–</div><div class="s" id="t-vram-s">&nbsp;</div></div>
+  <div class="tile"><div class="k">Leistung</div><div class="v" id="t-power">–</div><div class="s">Limit 500 W</div></div>
+  <div class="tile"><div class="k">Temperatur</div><div class="v" id="t-temp">–</div><div class="s">&nbsp;</div></div>
+</section>
+<section class="charts" id="charts"></section>
+<footer>Werte von Netdata (Sammler nvidia_smi, alle 10 s). Aktualisierung alle 10 s.</footer>
+</main>
+<script>
+"use strict";
+const API = "/netdata/api/v3/data";
+// Diagramme: Kontext, Umrechnung der Dimensionen in einen Wert, Einheit, feste Obergrenze
+const CHARTS = [
+  { id: "util",  title: "GPU-Auslastung", ctx: "nvidia_smi.gpu_utilization", unit: "%", max: 100,
+    val: d => d.gpu },
+  { id: "vram",  title: "VRAM belegt", ctx: "nvidia_smi.gpu_frame_buffer_memory_usage", unit: "GiB",
+    val: d => (d.used + (d.reserved || 0)) / 2 ** 30,
+    max: d => (d.used + d.free + (d.reserved || 0)) / 2 ** 30 },
+  { id: "power", title: "Leistung", ctx: "nvidia_smi.gpu_power_draw", unit: "W", max: 500,
+    val: d => d.power_draw },
+  { id: "temp",  title: "Temperatur", ctx: "nvidia_smi.gpu_temperature", unit: "°C", max: 90,
+    val: d => d.temperature },
+  { id: "mem",   title: "Speicher-Bandbreite (VRAM)", ctx: "nvidia_smi.gpu_memory_utilization", unit: "%", max: 100,
+    val: d => d.memory },
+  { id: "clock", title: "Takt (SM)", ctx: "nvidia_smi.gpu_clock_freq", unit: "MHz",
+    val: d => d.sm },
+  { id: "cpu",   title: "CPU", ctx: "system.cpu", unit: "%", max: 100, sum: true,
+    val: d => d.selected },
+  { id: "ram",   title: "RAM belegt", ctx: "system.ram", unit: "GiB",
+    val: d => d.used / 1024, max: d => (d.used + d.free + d.cached + d.buffers) / 1024 },
+];
+
+const box = document.getElementById("charts");
+for (const c of CHARTS) {
+  const el = document.createElement("div");
+  el.className = "chart";
+  el.innerHTML = `<h2>${c.title}<span id="v-${c.id}"></span></h2><canvas id="c-${c.id}"></canvas>`;
+  box.appendChild(el);
+}
+
+let bereich = 3600;
+document.getElementById("bereich").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  bereich = +b.dataset.s;
+  for (const x of document.querySelectorAll("#bereich button")) x.setAttribute("aria-pressed", x === b);
+  laden();
+});
+
+async function hole(c) {
+  const p = new URLSearchParams({ contexts: c.ctx, after: -bereich, before: 0, points: 300, format: "json2",
+    time_group: "average", group_by: c.sum ? "selected" : "dimension", aggregation: "sum" });
+  const r = await fetch(`${API}?${p}`, { credentials: "same-origin" });
+  if (!r.ok) throw new Error(`${c.ctx}: HTTP ${r.status}`);
+  const j = (await r.json()).result;
+  const labels = j.labels;
+  // json2 liefert neueste Werte zuerst, je Dimension [Wert, Anomalie, Annotationen]
+  return j.data.map(row => {
+    const d = {};
+    labels.forEach((l, i) => { if (i) d[l] = Array.isArray(row[i]) ? row[i][0] : row[i]; });
+    return { t: row[0] * 1000, d };
+  }).reverse();
+}
+
+function farbe(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function zeichne(c, pts) {
+  const cv = document.getElementById(`c-${c.id}`);
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext("2d");
+  g.scale(dpr, dpr);
+  g.clearRect(0, 0, W, H);
+  const L = 44, R = 6, T = 6, B = 18;
+  const xs = pts.map(p => p.t), ys = pts.map(p => p.y).filter(v => v != null && isFinite(v));
+  if (!xs.length) return;
+  let ymax = typeof c.max === "function" ? c.maxWert : c.max;
+  if (!ymax) ymax = Math.max(1, ...ys) * 1.1;
+  const x0 = Date.now() - bereich * 1000, x1 = Date.now();
+  const X = t => L + (t - x0) / (x1 - x0) * (W - L - R);
+  const Y = v => T + (1 - Math.min(v, ymax) / ymax) * (H - T - B);
+  g.font = "11px system-ui, sans-serif";
+  g.fillStyle = farbe("--muted"); g.strokeStyle = farbe("--grid"); g.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const v = ymax * i / 4, y = Y(v);
+    g.beginPath(); g.moveTo(L, y + .5); g.lineTo(W - R, y + .5); g.stroke();
+    g.textAlign = "right"; g.textBaseline = "middle";
+    g.fillText(v >= 100 ? Math.round(v) : +v.toFixed(1), L - 6, y);
+  }
+  g.textAlign = "center"; g.textBaseline = "top";
+  for (let i = 0; i <= 4; i++) {
+    const t = x0 + (x1 - x0) * i / 4;
+    const d = new Date(t);
+    const s = bereich > 86400 ? d.toLocaleDateString("de-DE", { weekday: "short", day: "numeric" })
+      : d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+    g.fillText(s, Math.min(Math.max(X(t), L + 14), W - R - 14), H - B + 4);
+  }
+  g.beginPath();
+  let start = null;
+  for (const p of pts) {
+    if (p.y == null || !isFinite(p.y)) continue;
+    if (start == null) { start = p; g.moveTo(X(p.t), Y(p.y)); } else g.lineTo(X(p.t), Y(p.y));
+  }
+  if (start == null) return;
+  g.strokeStyle = farbe("--line"); g.lineWidth = 1.5; g.stroke();
+  const last = pts.filter(p => p.y != null).pop();
+  g.lineTo(X(last.t), Y(0)); g.lineTo(X(start.t), Y(0)); g.closePath();
+  g.fillStyle = farbe("--fill"); g.fill();
+}
+
+const fmt = (v, n = 0) => v == null || !isFinite(v) ? "–" : v.toLocaleString("de-DE", { maximumFractionDigits: n, minimumFractionDigits: n });
+
+async function laden() {
+  const fehler = document.getElementById("fehler");
+  const ergebnisse = await Promise.allSettled(CHARTS.map(hole));
+  const aktuell = {};
+  const meldungen = [];
+  ergebnisse.forEach((e, i) => {
+    const c = CHARTS[i];
+    if (e.status !== "fulfilled") { meldungen.push(e.reason.message); return; }
+    const pts = e.value.map(p => ({ t: p.t, y: c.val(p.d), d: p.d }));
+    const last = [...pts].reverse().find(p => p.y != null && isFinite(p.y));
+    if (typeof c.max === "function" && last) c.maxWert = c.max(last.d);
+    aktuell[c.id] = last;
+    document.getElementById(`v-${c.id}`).textContent =
+      last ? `${fmt(last.y, c.unit === "GiB" ? 1 : 0)} ${c.unit}` : "";
+    zeichne(c, pts);
+  });
+  fehler.hidden = !meldungen.length;
+  fehler.textContent = meldungen.length ? "Keine Daten: " + meldungen.join("; ") : "";
+  const a = id => aktuell[id] && aktuell[id].y;
+  document.getElementById("t-util").textContent = `${fmt(a("util"))} %`;
+  document.getElementById("t-vram").textContent = `${fmt(a("vram"), 1)} GiB`;
+  document.getElementById("t-vram-s").textContent = CHARTS[1].maxWert ? `von ${fmt(CHARTS[1].maxWert, 1)} GiB` : "";
+  document.getElementById("t-power").textContent = `${fmt(a("power"))} W`;
+  document.getElementById("t-temp").textContent = `${fmt(a("temp"))} °C`;
+}
+
+laden();
+setInterval(laden, 10000);
+let rz;
+window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(laden, 200); });
+</script>
+</body>
+</html>
