@@ -326,4 +326,15 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - `docker-compose.yml`: `DEFAULT_LOCALE: "de-DE"` (Open WebUI v0.11.4, über `/api/config` als `default_locale` an den Browser). Ausgerollt mit `scripts/p4-openwebui.sh`, `/health` ok, `/api/config` liefert `de-DE`.
 - Wirkung: Gilt für jeden Browser, in dem noch keine Sprache gewählt wurde (sonst bisher Browsersprache). Wer unter Einstellungen → Allgemein → Sprache selbst etwas gewählt hat, behält das (im Browser gespeichert) und kann jederzeit umstellen.
 
+### Update Open WebUI v0.11.4 → v0.12.0 – 2026-10-12
+
+- Anlass: Release v0.12.0 (2026-10-10) mit Sicherheitshinweis (Zugriffsrechte; u. a. wird `ENABLE_ADMIN_CHAT_ACCESS=false` jetzt auch über die API durchgesetzt). Ablauf nach `Wartung.md` Abschnitt 3.
+- Image `ghcr.io/open-webui/open-webui:v0.12.0@sha256:1565038903151ced924b5a3226f73f40f16963df4b910441f6391f10144afdaa` (1,62 GB) in `docker-compose.yml`. Sicherung `data/webui.db.bak-update-v0.12.0` (SQLite-Backup inkl. WAL, `integrity_check` ok), unmittelbar vor dem Wechsel erneuert. Ausgerollt mit `scripts/p4-openwebui.sh`, Unterbrechung ca. 12 s.
+- Migrationen beim Start (Alembic, ohne Fehler): MFA-Status und Sitzungsstempel, Gruppenhierarchie, Skill-Snapshots, Versionsverlauf für Modelle sowie Tools/Funktionen, Index für PostgreSQL. `/api/version` liefert 0.12.0.
+- `scripts/p5-profile.sh`: Meldete beim ersten Lauf alle vier Profile als abweichend und schrieb sie neu (Sicherung `bak-p5-profile`, Neustart). Ursache: v0.12.0 ergänzt in `meta` die Felder `voice` und `voice_avatar` (leer), der Vergleich war feldgenau. Inhalt der Profile unverändert. Korrektur: Der Vergleich ignoriert jetzt leere Meta-Felder (läuft unter v0.11.4 und v0.12.0). Zweiter Lauf: „nichts geändert“ ✅
+- `scripts/p5-kopieren.sh` (7 von 7 Konten an) und `scripts/p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅
+- Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, die IDs `speak-button-…` und `continue-response-button` gibt es im Build von v0.12.0 weiterhin ✅
+- Rechte: `chat.controls`, `system_prompt`, `params`, `import`, `continue_response`, `tts`, `call` weiter aus; v0.12.0 bringt keine neuen Rechte-Schlüssel unter `chat`. Die neuen „Model controls“ brauchen `chat.controls` und `chat.params` und sind für Nutzer damit nicht erreichbar ✅
+- Browsertest durch den Admin: offen. Altes Image v0.11.4 bleibt bis dahin für ein Zurückrollen liegen.
+
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).

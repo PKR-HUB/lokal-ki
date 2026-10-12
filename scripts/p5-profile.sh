@@ -64,6 +64,10 @@ def ist_form(x):
     return dict(id=x.id, base_model_id=x.base_model_id, name=x.name, params=x.params.model_dump(),
                 meta=x.meta.model_dump(), is_active=x.is_active)
 
+def vergleich(f):
+    # Leere Meta-Felder ignorieren (v0.12.0 ergänzt z. B. voice, voice_avatar = None)
+    return {**f, "meta": {k: v for k, v in f["meta"].items() if v is not None}}
+
 def grants(x):
     return sorted((g.principal_type, g.principal_id, g.permission) for g in x.access_grants)
 
@@ -77,7 +81,7 @@ async def main():
         x = await Models.get_model_by_id(mid)
         if x is None:
             aenderungen.append(("neu", mid, soll_form(mid, name, system, desc)))
-        elif ist_form(x) != soll_form(mid, name, system, desc) or grants(x) != ALLE:
+        elif vergleich(ist_form(x)) != vergleich(soll_form(mid, name, system, desc)) or grants(x) != ALLE:
             aenderungen.append(("ändern", mid, soll_form(mid, name, system, desc)))
     order_neu = cfg.get("ui.model_order_list") != ORDER
     default_neu = cfg.get("ui.default_models") != DEFAULT

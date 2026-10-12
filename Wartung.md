@@ -19,7 +19,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 | llama.cpp | Tag `b11378`, statisch, `sm_120a` | GitHub, selbst gebaut in `/opt/llama.cpp` | Abschnitt 4 |
 | Modell | Qwen3.8-27B UD-Q4_K_XL + mmproj, 18 GB | Hugging Face (unsloth) in `/srv/models` | Abschnitt 5 |
 | Docker | 29.1.3, Compose 2.40.3 | Ubuntu | mit `apt upgrade` |
-| Open WebUI | v0.11.4, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
+| Open WebUI | v0.12.0, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
 | Caddy | 2.6.2 | Ubuntu | mit `apt upgrade` |
 | Netdata | 2.12.0 | Netdata-Repo (`etc/apt/sources.list.d/netdata.sources`) | mit `apt upgrade` (nicht automatisch) |
 | Firewall, SSH | ufw (22 und 443 aus 192.168.10.0/24), nur Schlüssel-Login | Ubuntu | – |
@@ -107,7 +107,7 @@ Open WebUI ändert oft Einstellungen, Rechte und Datenbank-Schema. Ein Update nu
    sudo docker logs --since 5m open-webui 2>&1 | grep -iE "error|exception" | head
    ```
 4. Im Browser prüfen: Anmeldung, die vier Profile, ein Chat mit Websuche, als normaler Nutzer keine System-Prompt-Felder und keine Parameter.
-5. **Die Skripte hängen an Interna von v0.11.4** (Modell-Klassen, Tabellen `chat_file`, `knowledge_file`, `feedback`, Rechte-Schlüssel). Nach einem Update `p5-profile.sh` und einen Probelauf von `p6-loeschung.sh` immer laufen lassen. Bricht eines ab, das Skript an die neue Version anpassen, bevor der nächste nächtliche Löschlauf kommt (oder bis dahin zurückrollen).
+5. **Die Skripte hängen an Interna von Open WebUI** (geschrieben für v0.11.4, geprüft mit v0.12.0: Modell-Klassen, Tabellen `chat_file`, `knowledge_file`, `feedback`, Rechte-Schlüssel). Nach einem Update `p5-profile.sh`, `p5-kopieren.sh`, `p5-knoepfe.sh` (alle sollen „nichts geändert“ melden) und einen Probelauf von `p6-loeschung.sh` immer laufen lassen, außerdem prüfen, ob die Selektoren in `etc/caddy/owui/custom.css` noch im Build vorkommen. Bricht eines ab, das Skript an die neue Version anpassen, bevor der nächste nächtliche Löschlauf kommt (oder bis dahin zurückrollen).
 6. Committen, SETUP-LOG ergänzen, altes Image entfernen (Abschnitt 6).
 
 **Zurückrollen:** Das neue Schema lässt sich nicht zurückmigrieren. Deshalb altes Image wieder in `docker-compose.yml` eintragen, Container stoppen, Sicherung zurückspielen (die DB läuft im WAL-Modus, `-wal` und `-shm` müssen mit weg), starten:
