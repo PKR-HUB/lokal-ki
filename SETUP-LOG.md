@@ -335,6 +335,6 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - `scripts/p5-kopieren.sh` (7 von 7 Konten an) und `scripts/p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅
 - Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, die IDs `speak-button-…` und `continue-response-button` gibt es im Build von v0.12.0 weiterhin ✅
 - Rechte: `chat.controls`, `system_prompt`, `params`, `import`, `continue_response`, `tts`, `call` weiter aus; v0.12.0 bringt keine neuen Rechte-Schlüssel unter `chat`. Die neuen „Model controls“ brauchen `chat.controls` und `chat.params` und sind für Nutzer damit nicht erreichbar ✅
-- Browsertest durch den Admin: offen. Altes Image v0.11.4 bleibt bis dahin für ein Zurückrollen liegen.
+- Browsertest durch den Admin: Profile, Websuche, Nutzerrechte und ausgeblendete Knöpfe ok ✅. Danach altes Image v0.11.4 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.0` bleibt im Volume.
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
