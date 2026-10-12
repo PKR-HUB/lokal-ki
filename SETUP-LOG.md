@@ -357,6 +357,6 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
   Generierung bei gleicher Annahmequote unverändert, Prefill etwas schneller. A3, A4, A14 bestanden ✅. Wie in P3 beendete ein A14-Slot mit `max_tokens=2048` seine Denkphase nicht (für die VRAM-Messung unerheblich).
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content` ✅
-- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche): offen.
+- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche) ok ✅. Danach Kopie `/opt/llama.cpp/llama-server.b11378` gelöscht; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11378`).
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
