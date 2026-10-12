@@ -16,7 +16,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 | Ubuntu | 26.04, Kernel 7.0.0-38 | Ubuntu | automatisch (Sicherheit), Rest monatlich von Hand |
 | NVIDIA-Treiber | 595.91.07, `nvidia-headless-595-open` | Ubuntu | mit `apt upgrade`, danach Neustart |
 | CUDA-Toolkit | 13.3.1, `apt-mark hold` | NVIDIA-Repo (Priorität 100) | nur für einen neuen llama.cpp-Build |
-| llama.cpp | Tag `b11378`, statisch, `sm_120a` | GitHub, selbst gebaut in `/opt/llama.cpp` | Abschnitt 4 |
+| llama.cpp | Tag `b11565`, statisch, `sm_120a` | GitHub, selbst gebaut in `/opt/llama.cpp` | Abschnitt 4 |
 | Modell | Qwen3.8-27B UD-Q4_K_XL + mmproj, 18 GB | Hugging Face (unsloth) in `/srv/models` | Abschnitt 5 |
 | Docker | 29.1.3, Compose 2.40.3 | Ubuntu | mit `apt upgrade` |
 | Open WebUI | v0.12.0, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
@@ -129,8 +129,9 @@ Die Umgebungsvariablen stehen in `docker-compose.yml` (Geheimes in `.env`). Viel
 
 Update nur bei Bedarf: Fehlerbehebung für Qwen3.8, MTP oder Blackwell, oder spürbar mehr Leistung. Releases: <https://github.com/ggml-org/llama.cpp/releases>
 
-1. Build (dauert, der laufende Dienst bleibt bis zum Neustart auf dem alten Binary):
+1. Laufendes Binary sichern, dann bauen (ca. 3 min; der laufende Dienst bleibt bis zum Neustart auf dem alten Binary, startet er vorher von selbst neu, nimmt er schon das neue):
    ```bash
+   cp -p /opt/llama.cpp/build/bin/llama-server /opt/llama.cpp/llama-server.bALT   # ALT = bisheriger Tag
    LLAMA_TAG=bNNNNN scripts/p3-build-llama.sh     # als msb, ohne sudo
    ```
 2. Flags gegen die neue Version prüfen, sie ändern sich gelegentlich:
@@ -139,13 +140,14 @@ Update nur bei Bedarf: Fehlerbehebung für Qwen3.8, MTP oder Blackwell, oder sp�
    ```
 3. Neu starten und messen:
    ```bash
-   scripts/p3-llama-service.sh           # Neustart, wartet auf /health
+   sudo systemctl restart llama-server   # p3-llama-service.sh startet nur bei geänderter Unit neu
+   curl -fsS http://127.0.0.1:8080/props | grep -o '"build_info":"[^"]*"'   # neuer Tag?
    scripts/p3-bench.py all               # A3, A4, A14 – Werte mit SETUP-LOG P3 vergleichen
    ```
 4. Im Browser je ein Chat mit Bild und mit Websuche (Werkzeugaufrufe).
 5. Neuen Tag in `scripts/p3-build-llama.sh` eintragen, SETUP-LOG ergänzen, committen.
 
-**Zurückrollen:** `LLAMA_TAG=b11378 scripts/p3-build-llama.sh`, dann `scripts/p3-llama-service.sh`.
+**Zurückrollen:** schnell mit der Kopie: `cp -p /opt/llama.cpp/llama-server.bALT /opt/llama.cpp/build/bin/llama-server`, dann `sudo systemctl restart llama-server`. Oder neu bauen: `LLAMA_TAG=bALT scripts/p3-build-llama.sh`, dann Neustart. Die Kopie nach erfolgreichem Test löschen.
 
 Braucht eine neue llama.cpp-Version ein neueres CUDA: `sudo apt-mark unhold cuda-toolkit-13-3`, neues Toolkit installieren, Pfade in `p3-build-llama.sh` anpassen, wieder halten. Ein neues CUDA-Toolkit kann einen neueren Treiber voraussetzen.
 

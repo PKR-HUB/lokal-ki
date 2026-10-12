@@ -1,0 +1,29 @@
+{
+ "a3": {
+  "requests": [
+   {
+    "label": "A3-einzeln",
+    "start_s": 1791797423.93,
+    "first_think_s": 0.27,
+    "first_answer_s": 2.44,
+    "total_s": 12.2,
+    "prompt_tokens": 135,
+    "prefill_tok_s": 1040.5,
+    "gen_tokens": 1442,
+    "gen_tok_s": 120.8,
+    "draft_n": 1779,
+    "draft_accepted": 848,
+    "answer_words": 672,
+    "think_chars": 1227,
+    "draft_accept_rate": 0.48
+   }
+  ],
+  "gpu": {
+   "power_limit_w": 500.0,
+   "power_max_w": 501.4,
+   "power_avg_w": 485.5,
+   "temp_max_c": 60.0,
+   "vram_max_mib": 24692.0
+  }
+ }
+}

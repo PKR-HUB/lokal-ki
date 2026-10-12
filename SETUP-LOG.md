@@ -337,4 +337,26 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Rechte: `chat.controls`, `system_prompt`, `params`, `import`, `continue_response`, `tts`, `call` weiter aus; v0.12.0 bringt keine neuen Rechte-Schlüssel unter `chat`. Die neuen „Model controls“ brauchen `chat.controls` und `chat.params` und sind für Nutzer damit nicht erreichbar ✅
 - Browsertest durch den Admin: Profile, Websuche, Nutzerrechte und ausgeblendete Knöpfe ok ✅. Danach altes Image v0.11.4 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.0` bleibt im Volume.
 
+### Update llama.cpp b11378 → b11565 – 2026-10-12
+
+- Anlass (187 Commits seit b11378, gefiltert nach unserem Setup): MTP-Kopf bekam bei Bild-Eingaben Nullen statt der Bild-Embeddings, dadurch niedrigere Annahmequote (#30257); Use-after-free/double free im Tool-Call-Parser (#29942); CUDA: MMQ-Speicherfehler (#29953, #29941), Race in FlashAttention (#30103). Risiko: Chat-Schnittstelle umgebaut (#30210, #29876), daher Tool-Calls und Denkphase getestet. Neuer Standard-Port 9931 (#30159) ohne Wirkung, die Unit setzt `--port 8080`.
+- Altes Binary gesichert als `/opt/llama.cpp/llama-server.b11378`. Build `LLAMA_TAG=b11565 scripts/p3-build-llama.sh` (Commit `f9a95aeb2096d0c0218e0cd6e6d901cd37be798a`, `version: 0.6.0-dev (build 11565)`), Dauer ca. 2:40 min, Dienst lief währenddessen weiter. Die eingebaute Weboberfläche von llama.cpp (von uns nicht genutzt) wird beim Build jetzt von Hugging Face geladen; für b11565 fehlte die Prüfsumme, genommen wurde das verifizierte Paket „latest“.
+- Flags: alle 16 Flags der Unit in `--help` von b11565 vorhanden und unverändert, Unit nicht geändert.
+- Neustart `sudo systemctl restart llama-server` (Admin-Freigabe), bereit nach 4 s; `/props`: `b11565-f9a95aeb2`, 2 Slots, Vision an, MTP-Draft-Kontext angelegt. `scripts/p3-llama-service.sh` startet nur bei geänderter Unit neu, `Wartung.md` Abschnitt 4 entsprechend korrigiert (Neustart per `systemctl`, Binary-Kopie zum Zurückrollen).
+- Messung bei 500 W (`bench/b11565-2026-10-12/`), Vergleich mit P3 (500 W):
+
+| Messung | b11378 | b11565 |
+|---|---|---|
+| A3 Generierung, MTP-Quote ~0,62 | 142,4 Token/s | 142,6 Token/s (0,63) |
+| A3 Generierung, MTP-Quote ~0,45–0,48 | 119,9–122,1 Token/s | 120,8–122,0 Token/s |
+| A3 Gesamtzeit | ≤ 19,4 s | 10,8 / 16,4 / 12,2 s |
+| A4 2 parallel, je | 122,6–124,6 Token/s (Quote 0,63–0,66) | 100,8 (0,45) / 120,2 (0,62) Token/s; 3. Anfrage wartet und wird beantwortet |
+| Prefill 54k Tokens (2 Slots) | ca. 2.285 Token/s | ca. 2.390 Token/s (+4,5 %) |
+| VRAM | 24.678 MiB | 24.696 MiB |
+| Leistung (Mittel) / max. Temperatur | ca. 495 W / 69 °C | ca. 490 W / 70 °C |
+
+  Generierung bei gleicher Annahmequote unverändert, Prefill etwas schneller. A3, A4, A14 bestanden ✅. Wie in P3 beendete ein A14-Slot mit `max_tokens=2048` seine Denkphase nicht (für die VRAM-Messung unerheblich).
+- Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content` ✅
+- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche): offen.
+
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
