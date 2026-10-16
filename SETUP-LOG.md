@@ -337,6 +337,16 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Rechte: `chat.controls`, `system_prompt`, `params`, `import`, `continue_response`, `tts`, `call` weiter aus; v0.12.0 bringt keine neuen Rechte-Schlüssel unter `chat`. Die neuen „Model controls“ brauchen `chat.controls` und `chat.params` und sind für Nutzer damit nicht erreichbar ✅
 - Browsertest durch den Admin: Profile, Websuche, Nutzerrechte und ausgeblendete Knöpfe ok ✅. Danach altes Image v0.11.4 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.0` bleibt im Volume.
 
+### Update Open WebUI v0.12.0 → v0.12.2 – 2026-10-16
+
+- Anlass: Fehlerbehebungen in v0.12.1/v0.12.2 (2026-10-14), u. a. Reconnect-Schleife seit 0.12.0 (Tab verbindet sich nach Verbindungsabbruch mehrmals pro Sekunde neu und belastet den Server), Löschen einer Nachricht mitten im Chat ließ das Modell den früheren Verlauf vergessen, Kanal-Metadaten nicht mehr per API fälschbar. Ablauf nach `Wartung.md` Abschnitt 3.
+- Image `ghcr.io/open-webui/open-webui:v0.12.2@sha256:10e6a78ba2d172493460a9e8a92c496aaa7a64dc4d26d622a2e95e0c736081c9` in `docker-compose.yml`. Sicherung `data/webui.db.bak-update-v0.12.2` (SQLite-Backup, `integrity_check` ok). Ausgerollt mit `scripts/p4-openwebui.sh`, Unterbrechung ca. 12 s. `/api/version` liefert 0.12.2.
+- Migrationen beim Start (Alembic, ohne Fehler): Tabelle für Apps (neue Funktion „Apps in Kanälen“, `ENABLE_APPS` Standard `False`, bleibt aus), fehlende Anmelde-Einträge für SCIM-Konten (SCIM nutzen wir nicht).
+- `scripts/p5-profile.sh`, `p5-kopieren.sh` (10 von 10 Konten an), `p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅. Im Log keine Fehler (nur eine FutureWarning von grpcio).
+- Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, `speak-button-…` und `continue-response-button` im Build von v0.12.2 vorhanden ✅
+- Rechte: Standard-Rechte-Schlüssel (`chat`, `workspace`, `sharing`, `features`, `settings`, `access_grants`) identisch mit v0.12.0 ✅
+- Offen: Browsertest durch den Admin; danach altes Image v0.12.0 mit `docker rmi` entfernen.
+
 ### Update llama.cpp b11378 → b11565 – 2026-10-12
 
 - Anlass (187 Commits seit b11378, gefiltert nach unserem Setup): MTP-Kopf bekam bei Bild-Eingaben Nullen statt der Bild-Embeddings, dadurch niedrigere Annahmequote (#30257); Use-after-free/double free im Tool-Call-Parser (#29942); CUDA: MMQ-Speicherfehler (#29953, #29941), Race in FlashAttention (#30103). Risiko: Chat-Schnittstelle umgebaut (#30210, #29876), daher Tool-Calls und Denkphase getestet. Neuer Standard-Port 9931 (#30159) ohne Wirkung, die Unit setzt `--port 8080`.
