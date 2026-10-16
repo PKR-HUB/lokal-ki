@@ -1,0 +1,45 @@
+{
+ "a14": {
+  "requests": [
+   {
+    "label": "A14-slot1",
+    "start_s": 1792133058.45,
+    "first_think_s": 42.45,
+    "first_answer_s": 53.38,
+    "total_s": 55.37,
+    "prompt_tokens": 54035,
+    "prefill_tok_s": 2443.3,
+    "gen_tokens": 1544,
+    "gen_tok_s": 119.4,
+    "draft_n": 1308,
+    "draft_accepted": 1108,
+    "answer_words": 119,
+    "think_chars": 2658,
+    "draft_accept_rate": 0.85
+   },
+   {
+    "label": "A14-slot2",
+    "start_s": 1792133058.45,
+    "first_think_s": 22.46,
+    "first_answer_s": 45.06,
+    "total_s": 46.89,
+    "prompt_tokens": 54035,
+    "prefill_tok_s": 2441.3,
+    "gen_tokens": 465,
+    "gen_tok_s": 19.0,
+    "draft_n": 420,
+    "draft_accepted": 324,
+    "answer_words": 82,
+    "think_chars": 1246,
+    "draft_accept_rate": 0.77
+   }
+  ],
+  "gpu": {
+   "power_limit_w": 500.0,
+   "power_max_w": 506.0,
+   "power_avg_w": 493.5,
+   "temp_max_c": 70.0,
+   "vram_max_mib": 24696.0
+  }
+ }
+}
