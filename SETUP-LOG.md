@@ -345,7 +345,7 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - `scripts/p5-profile.sh`, `p5-kopieren.sh` (10 von 10 Konten an), `p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅. Im Log keine Fehler (nur eine FutureWarning von grpcio).
 - Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, `speak-button-…` und `continue-response-button` im Build von v0.12.2 vorhanden ✅
 - Rechte: Standard-Rechte-Schlüssel (`chat`, `workspace`, `sharing`, `features`, `settings`, `access_grants`) identisch mit v0.12.0 ✅
-- Offen: Browsertest durch den Admin; danach altes Image v0.12.0 mit `docker rmi` entfernen.
+- Browsertest durch den Admin ok ✅. Danach altes Image v0.12.0 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.2` bleibt im Volume.
 
 ### Update llama.cpp b11378 → b11565 – 2026-10-12
 
