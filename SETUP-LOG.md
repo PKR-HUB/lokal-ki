@@ -367,7 +367,7 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
   Generierung bei gleicher Annahmequote unverändert, Prefill leicht schneller. A3, A4, A14 bestanden ✅. Bei A14 beendeten diesmal beide Slots ihre Denkphase und antworteten (bei b11378/b11565 lief ein Slot in `max_tokens=2048`).
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅
-- Offen: Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche); danach `/opt/llama.cpp/llama-server.b11565` löschen.
+- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche) ok ✅. Danach Kopie `/opt/llama.cpp/llama-server.b11565` gelöscht; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11565`).
 
 ### Update llama.cpp b11378 → b11565 – 2026-10-12
 
