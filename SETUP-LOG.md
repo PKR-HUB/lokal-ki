@@ -354,6 +354,7 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - `scripts/p5-profile.sh`, `p5-kopieren.sh` (11 von 11 Konten an), `p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅. Im Log keine Fehler (nur die bekannte FutureWarning von grpcio).
 - Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, `speak-button-…` und `continue-response-button` im Build vorhanden ✅ (Kommentar in `custom.css` angepasst).
 - Rechte: oberste Schlüssel unverändert; neu ist `features.encrypted_channels` (Ende-zu-Ende-verschlüsselte Chats in Kanälen), Standard `False`, ebenso `ENABLE_ENCRYPTED_CHANNELS`; bleibt aus.
+- Browsertest durch den Admin ok ✅. Danach altes Image v0.12.2 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.3` bleibt im Volume.
 
 ### Update llama.cpp b11565 → b11681 – 2026-10-16
 
