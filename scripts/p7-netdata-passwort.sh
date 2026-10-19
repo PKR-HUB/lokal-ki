@@ -11,7 +11,7 @@ read -rsp "Passwort wiederholen: " PW2; echo
 [ "${#PW1}" -ge 10 ] || { echo "Bitte mindestens 10 Zeichen." >&2; exit 1; }
 HASH=$(printf '%s\n' "$PW1" | caddy hash-password)
 umask 022
-printf 'basicauth {\n\tadmin %s\n}\n' "$HASH" > "$DST.neu"
+printf 'basic_auth {\n\tadmin %s\n}\n' "$HASH" > "$DST.neu"
 install -m 644 "$DST.neu" "$DST" && rm -f "$DST.neu"
 systemctl reload caddy
 echo "netdata: Passwort gesetzt (Benutzer admin)"

@@ -369,6 +369,14 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅
 - Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche) ok ✅. Danach Kopie `/opt/llama.cpp/llama-server.b11565` gelöscht; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11565`).
 
+### Update Caddy 2.6.2 (Ubuntu) → 2.11.7 (offizielles Repo) – 2026-10-19
+
+- Auf Wunsch des Admins: Caddy aus dem offiziellen Repo nach der Anleitung auf caddyserver.com statt aus Ubuntu (hebt P4-A4 auf). Neues Skript `scripts/p4-caddy-repo.sh` (idempotent): Schlüssel `/usr/share/keyrings/caddy-stable-archive-keyring.gpg`, Quelle `/etc/apt/sources.list.d/caddy-stable.list`, `apt-get install caddy` mit `--force-confold` (eigener Caddyfile bleibt), `caddy validate`, Neustart.
+- Vorher Sicherung von `/etc/caddy` und `/var/lib/caddy` (mit privatem Schlüssel der Root-CA) nach `/var/backups/caddy-vor-repo-2026-10-19.tar.gz` (root, 600). Datenverzeichnis, Benutzer `caddy` und Unit sind im offiziellen Paket gleich, die interne CA (`client/caddy-root.crt`) wird weiterverwendet; die Büro-PCs müssen nichts neu installieren.
+- `basicauth` ist seit Caddy 2.8 veraltet: in `/etc/caddy/netdata-auth.caddy` und `scripts/p7-netdata-passwort.sh` auf `basic_auth` umgestellt (Hash unverändert).
+- Tests: `caddy validate` ohne Warnung ✅; `caddy version` v2.11.7 ✅; gegen `client/caddy-root.crt`: `/` 200, `/static/custom.css` 200, `/netdata` 302, `/netdata/gpu/` und `/netdata/v3/` ohne Passwort 401 ✅; Caddy lauscht nur auf 443 (alle) und 2019 (127.0.0.1) ✅.
+- Hinweis: `unattended-upgrades` erfasst das Caddy-Repo nicht, Updates kommen mit dem monatlichen `apt upgrade` (`Wartung.md` angepasst).
+
 ### Update llama.cpp b11378 → b11565 – 2026-10-12
 
 - Anlass (187 Commits seit b11378, gefiltert nach unserem Setup): MTP-Kopf bekam bei Bild-Eingaben Nullen statt der Bild-Embeddings, dadurch niedrigere Annahmequote (#30257); Use-after-free/double free im Tool-Call-Parser (#29942); CUDA: MMQ-Speicherfehler (#29953, #29941), Race in FlashAttention (#30103). Risiko: Chat-Schnittstelle umgebaut (#30210, #29876), daher Tool-Calls und Denkphase getestet. Neuer Standard-Port 9931 (#30159) ohne Wirkung, die Unit setzt `--port 8080`.

@@ -17,7 +17,7 @@ LAN :443 → Caddy (tls internal, etc/caddy/Caddyfile)
          → Open WebUI 127.0.0.1:3000 (Docker, network_mode: host, docker-compose.yml)
          → llama-server 127.0.0.1:8080 (systemd, User llm, etc/systemd/system/llama-server.service)
            Qwen3.8-27B UD-Q4_K_XL + mmproj (Vision) + MTP, 2 Slots, 128k Kontext
-          /netdata/ → GPU-Übersicht /netdata/gpu/ (etc/caddy/netdata-gpu), volle Oberfläche /netdata/v3/ → Netdata 127.0.0.1:19999 (basicauth, Hash in /etc/caddy/netdata-auth.caddy)
+          /netdata/ → GPU-Übersicht /netdata/gpu/ (etc/caddy/netdata-gpu), volle Oberfläche /netdata/v3/ → Netdata 127.0.0.1:19999 (basic_auth, Hash in /etc/caddy/netdata-auth.caddy)
 ```
 
 - Nur 22 und 443 sind aus 192.168.10.0/24 offen (ufw). Open WebUI läuft im Host-Netz, damit Docker die Firewall nicht umgeht. 3000, 8080 und 19999 (Netdata) dürfen nie nach außen gebunden werden.

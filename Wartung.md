@@ -20,7 +20,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 | Modell | Qwen3.8-27B UD-Q4_K_XL + mmproj, 18 GB | Hugging Face (unsloth) in `/srv/models` | Abschnitt 5 |
 | Docker | 29.1.3, Compose 2.40.3 | Ubuntu | mit `apt upgrade` |
 | Open WebUI | v0.12.0, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
-| Caddy | 2.6.2 | Ubuntu | mit `apt upgrade` |
+| Caddy | 2.11.7 | offizielles Caddy-Repo (dl.cloudsmith.io, stable) | mit `apt upgrade` (nicht automatisch) |
 | Netdata | 2.12.0 | Netdata-Repo (`etc/apt/sources.list.d/netdata.sources`) | mit `apt upgrade` (nicht automatisch) |
 | Firewall, SSH | ufw (22 und 443 aus 192.168.10.0/24), nur Schlüssel-Login | Ubuntu | – |
 
@@ -52,7 +52,7 @@ Dateien unter `etc/` im Repo spiegeln `/etc/`. Geändert wird immer im Repo, dan
 
 ### Was automatisch passiert
 
-`unattended-upgrades` installiert täglich Pakete aus `resolute` und `resolute-security`, also alle Sicherheitsupdates, auch für Kernel, Docker und Caddy. Pakete aus `resolute-updates` (normale Fehlerbehebungen, oft auch neue NVIDIA-Treiber) kommen **nicht** automatisch. Einen automatischen Neustart gibt es nicht.
+`unattended-upgrades` installiert täglich Pakete aus `resolute` und `resolute-security`, also alle Sicherheitsupdates, auch für Kernel und Docker. Caddy kommt seit 2026-10-19 aus dem offiziellen Caddy-Repo und wird daher **nicht** automatisch aktualisiert, sondern beim monatlichen `apt upgrade` mit. Pakete aus `resolute-updates` (normale Fehlerbehebungen, oft auch neue NVIDIA-Treiber) kommen **nicht** automatisch. Einen automatischen Neustart gibt es nicht.
 
 ### Monatlich von Hand (ca. 15 Minuten, außerhalb der Arbeitszeit)
 
