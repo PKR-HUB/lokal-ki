@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # P3: llama.cpp auf fixiertem Tag mit CUDA (sm_120a, RTX 5090) bauen. Idempotent.
 set -euo pipefail
-LLAMA_TAG="${LLAMA_TAG:-b11681}"
+LLAMA_TAG="${LLAMA_TAG:-b11731}"
 SRC=/opt/llama.cpp
 export PATH=/usr/local/cuda-13.3/bin:$PATH
 export CUDACXX=/usr/local/cuda-13.3/bin/nvcc

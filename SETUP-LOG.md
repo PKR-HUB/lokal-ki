@@ -356,6 +356,28 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Rechte: oberste Schlüssel unverändert; neu ist `features.encrypted_channels` (Ende-zu-Ende-verschlüsselte Chats in Kanälen), Standard `False`, ebenso `ENABLE_ENCRYPTED_CHANNELS`; bleibt aus.
 - Browsertest durch den Admin ok ✅. Danach altes Image v0.12.2 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.3` bleibt im Volume.
 
+### Update llama.cpp b11681 → b11731 – 2026-10-19
+
+- Anlass: Auftrag des Admins (kein dringender Fehler). Das GitHub-Release „Latest“ v0.7.0 entspricht b11669, b11681 lag schon darüber. Relevant aus 50 Commits: CUDA-Race (Write-after-Read im Shared Memory) im Flash-Attention-Vec-Kernel behoben (#30573, wir laufen mit `-fa on`); schnellere MMVQ für Q2_K/Q3_K/Q6_K (#30517, UD-Q4_K_XL enthält Q6_K); Stream-K-Blöcke auf die vorhandene Arbeit begrenzt (#30553); Grenzprüfung im FA-Tile-Kernel (#30572). Keine Änderungen an Server, MTP/Speculative, `mtmd` oder der Architektur `qwen35`; #30607 betrifft nur `qwen3`. Der Rest betrifft andere Backends (Hexagon, SYCL, Vulkan, ROCm, OpenCL) oder andere Modelle.
+- Altes Binary gesichert als `/opt/llama.cpp/llama-server.b11681`. Build `LLAMA_TAG=b11731 scripts/p3-build-llama.sh` (Commit `42b70032b18a6a9b281d83e3ef4818072a495fff`, `version: 0.7.0-dev (build 11731)`), Dauer ca. 2:10 min, Dienst lief währenddessen weiter.
+- Flags: alle 16 Flags der Unit in `--help` von b11731 vorhanden, Unit nicht geändert. Optionsliste identisch mit b11681.
+- Neustart `sudo systemctl restart llama-server` (Auftrag des Admins, beide Slots vorher frei), bereit nach 3 s; `/props`: `b11731-42b70032b`, 2 Slots, Vision an, MTP-Draft-Kontext angelegt.
+- Messung bei 500 W (`bench/b11731-2026-10-19/`), Vergleich mit b11681:
+
+| Messung | b11681 | b11731 |
+|---|---|---|
+| A3 Generierung, MTP-Quote ~0,62–0,64 | 142,0 / 139,4 Token/s | 144,2 / 144,6 Token/s |
+| A3 Generierung, MTP-Quote ~0,48–0,50 | 121,6 Token/s (0,50) | 122,4 Token/s (0,48) |
+| A3 Gesamtzeit | 18,0 / 17,4 / 16,1 s | 11,7 / 17,2 / 17,1 s (1.400–2.440 Token) |
+| A4 2 parallel, je | 116,5 (0,62) / 125,4 (0,67) Token/s | 102,8 (0,47) / 119,3 (0,62) Token/s; 3. Anfrage wartet und wird beantwortet (129,4 Token/s) |
+| Prefill 54k Tokens (2 Slots) | ca. 2.440 Token/s | ca. 2.450 Token/s |
+| VRAM | 24.696 MiB | 24.696 MiB |
+| Leistung (Mittel) / max. Temperatur | ca. 494 W / 70 °C | ca. 496 W / 71 °C |
+
+  Generierung bei gleicher Annahmequote um ca. 2–3 % schneller (A3), sonst unverändert. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
+- Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅
+- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche): offen. Danach Kopie `/opt/llama.cpp/llama-server.b11681` löschen.
+
 ### Update llama.cpp b11565 → b11681 – 2026-10-16
 
 - Anlass: Auftrag des Admins (kein dringender Fehler). Relevant aus 116 Commits: Server bevorzugt freie Slots, speichert den MTP-Draft-Zustand mit und legt nur wiederherstellbare Zustände in den Prompt-Cache (#30567, #30574, #30498); Off-by-two bei der SWA-Cache-Wiederverwendung (#30580); Jinja-Fixes (Schleifen-Variablen, `tojson`; #30533, #30483, #30362); ungültiges UTF-8 wird abgewiesen (#30485); CUDA-Pinned-Host-Puffer auf 4 GB begrenzt (#30449). Risiko: Chat-Ausgabe erneut umgebaut (#30389), daher Tool-Calls getestet. Version jetzt 0.7.0-dev.
