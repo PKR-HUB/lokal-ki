@@ -376,7 +376,7 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
   Generierung bei gleicher Annahmequote um ca. 2–3 % schneller (A3), sonst unverändert. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅
-- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche): offen. Danach Kopie `/opt/llama.cpp/llama-server.b11681` löschen.
+- Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche) ok ✅. Danach Kopie `/opt/llama.cpp/llama-server.b11681` gelöscht; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11681`).
 
 ### Update llama.cpp b11565 → b11681 – 2026-10-16
 
