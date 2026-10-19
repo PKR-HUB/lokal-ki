@@ -347,6 +347,14 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Rechte: Standard-Rechte-Schlüssel (`chat`, `workspace`, `sharing`, `features`, `settings`, `access_grants`) identisch mit v0.12.0 ✅
 - Browsertest durch den Admin ok ✅. Danach altes Image v0.12.0 gezielt mit `docker rmi` entfernt; die Sicherung `bak-update-v0.12.2` bleibt im Volume.
 
+### Update Open WebUI v0.12.2 → v0.12.3 – 2026-10-19
+
+- Anlass: Fehlerbehebungen in v0.12.3 (2026-10-16), u. a. PDF-Links (arXiv, Wikimedia) werden als Dokument gelesen statt als rohe Bytes, Kontext-Zusammenfassung bei langen Werkzeugaufrufen ohne Quelleninhalte, Speichern der Oberflächen-Einstellungen übernimmt die Admin-Vorgaben nicht mehr als eigene Werte. Keine Sicherheitskorrekturen, nichts Inkompatibles für uns. Ablauf nach `Wartung.md` Abschnitt 3.
+- Image `ghcr.io/open-webui/open-webui:v0.12.3@sha256:a537bbe1e6b428820f52ed4a029d7fff97062e24d5cf32c365fba36fd0542def` in `docker-compose.yml`. Sicherung `data/webui.db.bak-update-v0.12.3` (SQLite-Backup, `integrity_check` ok). Ausgerollt mit `scripts/p4-openwebui.sh`, Unterbrechung ca. 13 s. `/api/version` liefert 0.12.3. Keine Datenbank-Migrationen.
+- `scripts/p5-profile.sh`, `p5-kopieren.sh` (11 von 11 Konten an), `p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅. Im Log keine Fehler (nur die bekannte FutureWarning von grpcio).
+- Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, `speak-button-…` und `continue-response-button` im Build vorhanden ✅ (Kommentar in `custom.css` angepasst).
+- Rechte: oberste Schlüssel unverändert; neu ist `features.encrypted_channels` (Ende-zu-Ende-verschlüsselte Chats in Kanälen), Standard `False`, ebenso `ENABLE_ENCRYPTED_CHANNELS`; bleibt aus.
+
 ### Update llama.cpp b11565 → b11681 – 2026-10-16
 
 - Anlass: Auftrag des Admins (kein dringender Fehler). Relevant aus 116 Commits: Server bevorzugt freie Slots, speichert den MTP-Draft-Zustand mit und legt nur wiederherstellbare Zustände in den Prompt-Cache (#30567, #30574, #30498); Off-by-two bei der SWA-Cache-Wiederverwendung (#30580); Jinja-Fixes (Schleifen-Variablen, `tojson`; #30533, #30483, #30362); ungültiges UTF-8 wird abgewiesen (#30485); CUDA-Pinned-Host-Puffer auf 4 GB begrenzt (#30449). Risiko: Chat-Ausgabe erneut umgebaut (#30389), daher Tool-Calls getestet. Version jetzt 0.7.0-dev.
