@@ -19,7 +19,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 | llama.cpp | Tag `b11565`, statisch, `sm_120a` | GitHub, selbst gebaut in `/opt/llama.cpp` | Abschnitt 4 |
 | Modell | Qwen3.8-27B UD-Q4_K_XL + mmproj, 18 GB | Hugging Face (unsloth) in `/srv/models` | Abschnitt 5 |
 | Docker | 29.1.3, Compose 2.40.3 | Ubuntu | mit `apt upgrade` |
-| Open WebUI | v0.12.0, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
+| Open WebUI | v0.12.3, per Tag und Digest fixiert | ghcr.io | Abschnitt 3 |
 | Caddy | 2.11.7 | offizielles Caddy-Repo (dl.cloudsmith.io, stable) | mit `apt upgrade` (nicht automatisch) |
 | Netdata | 2.12.0 | Netdata-Repo (`etc/apt/sources.list.d/netdata.sources`) | mit `apt upgrade` (nicht automatisch) |
 | Firewall, SSH | ufw (22 und 443 aus 192.168.10.0/24), nur Schlüssel-Login | Ubuntu | – |
