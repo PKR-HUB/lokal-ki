@@ -437,5 +437,6 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Dabei gefunden: unsere Pin-Datei wurde von `cuda-repository-pin-600` überstimmt (P3-A7). `etc/apt/preferences.d/nvidia-cuda-repo` umbenannt in `00-nvidia-cuda-repo`, `scripts/p3-cuda-toolkit.sh` installiert sie und entfernt die alte Datei. Skript ausgeführt: nichts installiert oder entfernt.
 - Tests: `apt-cache policy` zeigt für das NVIDIA-Repo und `cuda-toolkit-13-3` jetzt 100 ✅; Hold auf `cuda-toolkit-13-3` aktiv ✅; Treiber `nvidia-headless-595-open` weiter aus Ubuntu (500) ✅; `apt list --upgradable` ohne NVIDIA-Pakete ✅.
 - Erste Prüfung: angeboten werden `cuda-toolkit-13-4` 13.4.3-1 (NVIDIA) und `cuda-toolkit-13-1` 13.1.1 (Ubuntu). Kein Wechsel jetzt: llama.cpp b11731 baut und läuft mit 13.3; 13.4 beim nächsten llama.cpp-Update mit prüfen (Treiber 595 kann CUDA 13.2, 13.4 nur über Minor-Version-Kompatibilität).
+- `Wartung.md` Versionstabelle: Treiber 595.91.07 → 595.99.02 nachgetragen (mit `apt upgrade` am 2026-10-09 aus `resolute-updates` gekommen, `nvidia-smi`: CUDA 13.2).
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).

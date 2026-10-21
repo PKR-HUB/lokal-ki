@@ -14,7 +14,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 | Baustein | Version (Stand 2026-10-04) | Herkunft | Update-Weg |
 |---|---|---|---|
 | Ubuntu | 26.04, Kernel 7.0.0-38 | Ubuntu | automatisch (Sicherheit), Rest monatlich von Hand |
-| NVIDIA-Treiber | 595.91.07, `nvidia-headless-595-open` | Ubuntu | mit `apt upgrade`, danach Neustart |
+| NVIDIA-Treiber | 595.99.02 (seit 2026-10-09), `nvidia-headless-595-open` | Ubuntu | mit `apt upgrade`, danach Neustart |
 | CUDA-Toolkit | 13.3.1, `apt-mark hold` | NVIDIA-Repo (Priorität 100) | halbjährlich prüfen (Abschnitt 4), nur mit neuem llama.cpp-Build |
 | llama.cpp | Tag `b11731`, statisch, `sm_120a` | GitHub, selbst gebaut in `/opt/llama.cpp` | Abschnitt 4 |
 | Modell | Qwen3.8-27B UD-Q4_K_XL + mmproj, 18 GB | Hugging Face (unsloth) in `/srv/models` | Abschnitt 5 |
