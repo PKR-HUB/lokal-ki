@@ -62,7 +62,7 @@ apt list --upgradable                 # ansehen, was kommt (NVIDIA? Kernel? Dock
 sudo apt upgrade
 sudo apt autoremove --purge           # alte Kernel und nicht mehr benötigte Pakete
 sudo apt clean                        # heruntergeladene .deb-Dateien löschen
-dpkg -l | awk '/^rc/{print $2}' | xargs -r sudo apt purge -y   # Reste entfernter Pakete
+dpkg -l | awk '/^rc/ && $2 != "grub-pc" {print $2}' | xargs -r sudo apt purge -y   # Reste entfernter Pakete; grub-pc nie (Purge löscht /etc/default/grub)
 [ -f /var/run/reboot-required ] && cat /var/run/reboot-required.pkgs
 ```
 

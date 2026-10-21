@@ -439,5 +439,6 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Erste Prüfung: angeboten werden `cuda-toolkit-13-4` 13.4.3-1 (NVIDIA) und `cuda-toolkit-13-1` 13.1.1 (Ubuntu). Kein Wechsel jetzt: llama.cpp b11731 baut und läuft mit 13.3; 13.4 beim nächsten llama.cpp-Update mit prüfen (Treiber 595 kann CUDA 13.2, 13.4 nur über Minor-Version-Kompatibilität).
 - `Wartung.md` Versionstabelle: Treiber 595.91.07 → 595.99.02 nachgetragen (mit `apt upgrade` am 2026-10-09 aus `resolute-updates` gekommen, `nvidia-smi`: CUDA 13.2).
 - `apt autoremove --purge`: `nvidia-firmware-595-595.91.07` (Firmware des alten Treibers, geladen ist 595.99.02) und `libnss3-tools` entfernt. Danach `caddy` und `llama-server` aktiv, `nvidia-smi` ok ✅.
+- Reste des Altkernels 7.0.0-30 (`linux-image-unsigned`, `linux-modules`, `linux-main-modules-zfs`) vom Admin per `apt purge` entfernt (Claude-Code-Sicherheitsprüfung hatte den Aufruf blockiert); es läuft 7.0.0-38. `grub-pc` bleibt als rc-Paket: sein Purge-Skript löscht `/etc/default/grub`, das auch `grub-efi` nutzt (Server bootet per EFI). Befehl in `Wartung.md` Abschnitt 2 nimmt `grub-pc` jetzt aus.
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
