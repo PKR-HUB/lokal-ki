@@ -87,7 +87,7 @@ Alle Skripte zweimal ausgeführt – zweiter Lauf ohne Änderungen (idempotent).
 
 | Schritt | Ergebnis |
 |---|---|
-| CUDA-Toolkit | `scripts/p3-cuda-toolkit.sh`: `cuda-toolkit-13-3` 13.3.1-1 (nvcc V13.3.73) aus dem NVIDIA-Repo `ubuntu2604`, per `apt-mark hold` fixiert. Ubuntu-Paket `nvidia-cuda-toolkit` ist nur 12.4 (kein sm_120). Pinning `/etc/apt/preferences.d/nvidia-cuda-repo` (Priorität 100): Treiberpakete kommen weiter von Ubuntu. |
+| CUDA-Toolkit | `scripts/p3-cuda-toolkit.sh`: `cuda-toolkit-13-3` 13.3.1-1 (nvcc V13.3.73) aus dem NVIDIA-Repo `ubuntu2604`, per `apt-mark hold` fixiert. Ubuntu-Paket `nvidia-cuda-toolkit` ist nur 12.4 (kein sm_120). Pinning `/etc/apt/preferences.d/nvidia-cuda-repo` (Priorität 100): Treiberpakete kommen weiter von Ubuntu. Seit 2026-10-21 `00-nvidia-cuda-repo`, siehe P3-A7. |
 | llama.cpp | `scripts/p3-build-llama.sh`: Tag **b11378**, Commit `edd6e2bbdad5930899a93db8fa73c3b61c7b9bcc`, CUDA-Arch `120a`, statisch, Ziele `llama-server` und `llama-bench`. Build vom Admin gestartet (Claude-Code-Sicherheitsprüfung hatte den Aufruf blockiert). |
 | Modell | `scripts/p3-download-model.sh`: `Qwen3.8-27B-UD-Q4_K_XL.gguf` (17.559.178.144 Byte) und `mmproj-F16.gguf` (927.607.488 Byte) aus `unsloth/Qwen3.8-27B-GGUF`, SHA256 gegen das HF-Repo geprüft ✅. Download per curl statt `hf`-CLI. 10 Verbindungsabbrüche (`Connection reset by peer`) wurden per Wiederaufnahme überbrückt. |
 | MTP | Die MTP-Schichten sind in der Modelldatei enthalten (`blk.64.nextn.*`, `qwen35.nextn_predict_layers`), keine separate `mtp-*.gguf` nötig. Log: „creating MTP draft context against the target model“. |
@@ -148,6 +148,7 @@ Hinweis zu A14: Mit `max_tokens=2048` hat das Modell bei 54k Kontext seine Denkp
 - **P3-A4 – llama-server.service**: `After=nvidia-persistenced.service` sowie Härtung (`NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`) ergänzt.
 - **P3-A5 – `CMAKE_CUDA_ARCHITECTURES=120a`**: explizit statt automatischer Erkennung gesetzt.
 - **P3-A6 – GPU-Leistungslimit 500 W statt 400 W** (N-OPS-04, 8.5): Entscheidung des Admins nach den Messungen 400/500/575 W. `gpu-powerlimit.service` auf `-pl 500` geändert und aktiv (`nvidia-smi`: 500.00 W). 500 W liefert fast das Tempo von 575 W bei ca. 70 W weniger Leistung und 69 °C statt 77 °C Spitzentemperatur. A1 gilt damit mit 500 W.
+- **P3-A7 – Pin-Datei `00-nvidia-cuda-repo` statt `nvidia-cuda-repo`** (2026-10-21): Die Priorität 100 wirkte nie. `cuda-keyring` legt `/etc/apt/preferences.d/cuda-repository-pin-600` an (`Package: *`, Priorität 600), die vor unserer Datei gelesen wird und gewinnt (`apt-cache policy`: 600). Ohne Folgen bisher, weil das NVIDIA-Repo die Ubuntu-Treiberpakete nicht unter gleichem Namen anbietet. Mit dem Präfix `00-` wird unsere Datei zuerst gelesen. Die NVIDIA-Datei bleibt unverändert (gehört dem Paket).
 
 ---
 
@@ -429,5 +430,12 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
   Generierung bei gleicher Annahmequote unverändert, Prefill etwas schneller. A3, A4, A14 bestanden ✅. Wie in P3 beendete ein A14-Slot mit `max_tokens=2048` seine Denkphase nicht (für die VRAM-Messung unerheblich).
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente korrekt, Denkphase getrennt in `reasoning_content` ✅
 - Browsertest durch den Admin (Chat mit Bild, Chat mit Websuche) ok ✅. Danach Kopie `/opt/llama.cpp/llama-server.b11378` gelöscht; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11378`).
+
+### Wartung: CUDA-Pinning korrigiert, CUDA-Prüfung eingeführt – 2026-10-21
+
+- Anlass: Frage des Admins, ob das gehaltene CUDA so bleiben soll. Gewollt (N-OPS-03), aber es fehlte eine regelmäßige Prüfung, sonst bleibt 13.3 auf Dauer. `Wartung.md`: neuer Abschnitt 4 „CUDA und Treiber prüfen“ und Zeile „halbjährlich“ im Kontrollplan.
+- Dabei gefunden: unsere Pin-Datei wurde von `cuda-repository-pin-600` überstimmt (P3-A7). `etc/apt/preferences.d/nvidia-cuda-repo` umbenannt in `00-nvidia-cuda-repo`, `scripts/p3-cuda-toolkit.sh` installiert sie und entfernt die alte Datei. Skript ausgeführt: nichts installiert oder entfernt.
+- Tests: `apt-cache policy` zeigt für das NVIDIA-Repo und `cuda-toolkit-13-3` jetzt 100 ✅; Hold auf `cuda-toolkit-13-3` aktiv ✅; Treiber `nvidia-headless-595-open` weiter aus Ubuntu (500) ✅; `apt list --upgradable` ohne NVIDIA-Pakete ✅.
+- Erste Prüfung: angeboten werden `cuda-toolkit-13-4` 13.4.3-1 (NVIDIA) und `cuda-toolkit-13-1` 13.1.1 (Ubuntu). Kein Wechsel jetzt: llama.cpp b11731 baut und läuft mit 13.3; 13.4 beim nächsten llama.cpp-Update mit prüfen (Treiber 595 kann CUDA 13.2, 13.4 nur über Minor-Version-Kompatibilität).
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).

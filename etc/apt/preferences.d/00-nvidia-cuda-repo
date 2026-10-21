@@ -1,4 +1,6 @@
 # NVIDIA-CUDA-Repo nur für das CUDA-Toolkit verwenden.
+# Dateiname mit "00-": apt nimmt bei gleichwertigen Einträgen den zuerst gelesenen, sonst gewinnt
+# cuda-repository-pin-600 aus dem Paket cuda-keyring (Priorität 600).
 # Priorität 100: Pakete, die es auch bei Ubuntu gibt (Treiber!), kommen weiter von Ubuntu.
 # Keine automatischen Upgrades aus diesem Repo (Version fixieren, PRD N-OPS-03).
 Package: *

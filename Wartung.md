@@ -15,7 +15,7 @@ Büro-PC (Browser) ──HTTPS :443──► Caddy ──► Open WebUI (Docker)
 |---|---|---|---|
 | Ubuntu | 26.04, Kernel 7.0.0-38 | Ubuntu | automatisch (Sicherheit), Rest monatlich von Hand |
 | NVIDIA-Treiber | 595.91.07, `nvidia-headless-595-open` | Ubuntu | mit `apt upgrade`, danach Neustart |
-| CUDA-Toolkit | 13.3.1, `apt-mark hold` | NVIDIA-Repo (Priorität 100) | nur für einen neuen llama.cpp-Build |
+| CUDA-Toolkit | 13.3.1, `apt-mark hold` | NVIDIA-Repo (Priorität 100) | halbjährlich prüfen (Abschnitt 4), nur mit neuem llama.cpp-Build |
 | llama.cpp | Tag `b11731`, statisch, `sm_120a` | GitHub, selbst gebaut in `/opt/llama.cpp` | Abschnitt 4 |
 | Modell | Qwen3.8-27B UD-Q4_K_XL + mmproj, 18 GB | Hugging Face (unsloth) in `/srv/models` | Abschnitt 5 |
 | Docker | 29.1.3, Compose 2.40.3 | Ubuntu | mit `apt upgrade` |
@@ -80,7 +80,7 @@ systemctl --failed
 
 **Netdata** kommt aus dem eigenen Repo von Netdata und wird von `unattended-upgrades` nicht erfasst, nur vom monatlichen `apt upgrade`. Nach einem Update prüfen: `sudo ss -tlnp | grep 19999` muss `127.0.0.1` zeigen, die Seite `/netdata/` muss nach Passwort fragen. Einstellungen stehen in `etc/netdata/netdata.conf`, installiert von `scripts/p7-netdata.sh`. Der Netdata-eigene Updater wird nicht verwendet.
 
-**Nicht mit `apt upgrade` verändern:** `cuda-toolkit-13-3` ist gehalten (`apt-mark showhold`). Das NVIDIA-Repo hat Priorität 100, Treiber kommen dadurch weiter von Ubuntu (`etc/apt/preferences.d/nvidia-cuda-repo`).
+**Nicht mit `apt upgrade` verändern:** `cuda-toolkit-13-3` ist gehalten (`apt-mark showhold`). Das NVIDIA-Repo hat Priorität 100, Treiber kommen dadurch weiter von Ubuntu (`etc/apt/preferences.d/00-nvidia-cuda-repo`; das `00-` ist nötig, sonst gilt die 600 aus `cuda-repository-pin-600` von `cuda-keyring`). Prüfen: `apt-cache policy | grep -A1 developer.download.nvidia` muss `100` zeigen.
 
 **Nach einem Ubuntu-Release-Upgrade** (z. B. auf 26.10 oder 28.04): Treiberpakete, CUDA-Repo, Docker und Caddy neu prüfen und die Abnahmetests wiederholen. Für den befristeten Betrieb nicht vorgesehen.
 
@@ -149,7 +149,19 @@ Update nur bei Bedarf: Fehlerbehebung für Qwen3.8, MTP oder Blackwell, oder sp�
 
 **Zurückrollen:** schnell mit der Kopie: `cp -p /opt/llama.cpp/llama-server.bALT /opt/llama.cpp/build/bin/llama-server`, dann `sudo systemctl restart llama-server`. Oder neu bauen: `LLAMA_TAG=bALT scripts/p3-build-llama.sh`, dann Neustart. Die Kopie nach erfolgreichem Test löschen.
 
-Braucht eine neue llama.cpp-Version ein neueres CUDA: `sudo apt-mark unhold cuda-toolkit-13-3`, neues Toolkit installieren, Pfade in `p3-build-llama.sh` anpassen, wieder halten. Ein neues CUDA-Toolkit kann einen neueren Treiber voraussetzen.
+### CUDA und Treiber prüfen (halbjährlich)
+
+CUDA ist gehalten und wird deshalb nie von selbst neuer. Damit es nicht jahrelang veraltet, halbjährlich (oder wenn ohnehin ein llama.cpp-Update ansteht) nachsehen:
+
+```bash
+apt list 'cuda-toolkit-1*' 2>/dev/null        # angebotene Toolkits (NVIDIA-Repo und Ubuntu)
+nvidia-smi | grep "CUDA Version"               # was der Treiber kann
+apt list 'nvidia-headless-*-open' 2>/dev/null  # neuere Treiberzweige (kommen nie automatisch)
+```
+
+Dazu die CUDA-Hinweise von llama.cpp (`docs/build.md`, Release-Notes) und die CUDA-Release-Notes von NVIDIA (Blackwell-Fehlerbehebungen). Wechseln, wenn llama.cpp ein neueres CUDA verlangt oder davon spürbar profitiert, oder spätestens wenn das Toolkit gut ein Jahr hinter der aktuellen Version liegt. Ergebnis der Prüfung kurz im SETUP-LOG vermerken, auch wenn nichts geändert wird.
+
+Wechsel: `sudo apt-mark unhold cuda-toolkit-13-3`, neues Toolkit installieren (`CUDA_PKG`/`CUDA_VER` in `scripts/p3-cuda-toolkit.sh`), Pfade in `p3-build-llama.sh` anpassen, llama.cpp neu bauen und wie oben testen, wieder halten. Ein neues CUDA-Toolkit kann einen neueren Treiber voraussetzen: Ein CUDA-Minor-Release über der „CUDA Version“ von `nvidia-smi` läuft meist noch (Minor-Version-Kompatibilität, so heute 13.3 auf 13.2), ein neues Major-Release (14.x) braucht einen passenden Treiberzweig. Treiberwechsel mit Neustart, vorher den Admin fragen.
 
 ## 5. Modell
 
@@ -186,6 +198,7 @@ Container-Logs sind auf 3 × 10 MB begrenzt (`docker-compose.yml`), das Journal 
 | monatlich | GPU | `nvidia-smi` (Temperatur, 500 W, ca. 24,6 GB belegt) |
 | vierteljährlich | Docker aufräumen | Abschnitt 6 |
 | vierteljährlich | Versionen prüfen | Release-Notes Open WebUI, llama.cpp; Update nur bei Bedarf |
+| halbjährlich | CUDA und Treiberzweig | Abschnitt 4, „CUDA und Treiber prüfen“ |
 | bei Bedarf | Brave-Abo und Kontingent | Brave-Dashboard |
 
 Stand 2026-10-04: 49 GB von 1,8 TB belegt (Modell 18 GB, Open-WebUI-Image 6,5 GB, Volume 1,1 GB).

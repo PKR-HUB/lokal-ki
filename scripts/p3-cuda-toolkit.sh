@@ -4,7 +4,9 @@ set -euo pipefail
 CUDA_PKG=cuda-toolkit-13-3
 CUDA_VER=13.3.1-1
 HERE="$(dirname "$(readlink -f "$0")")"
-sudo install -m 644 "$HERE/../etc/apt/preferences.d/nvidia-cuda-repo" /etc/apt/preferences.d/nvidia-cuda-repo
+sudo install -m 644 "$HERE/../etc/apt/preferences.d/00-nvidia-cuda-repo" /etc/apt/preferences.d/00-nvidia-cuda-repo
+# alter Name (vor 2026-10-21) wurde von cuda-repository-pin-600 überstimmt
+sudo rm -f /etc/apt/preferences.d/nvidia-cuda-repo
 if ! dpkg -s cuda-keyring >/dev/null 2>&1; then
   tmp=$(mktemp -d)
   curl -fsSL -o "$tmp/cuda-keyring.deb" \
