@@ -471,6 +471,6 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
   Generierung bei gleicher Annahmequote ca. 1–2 % schneller, Prefill ca. 1,5 % schneller, VRAM gleich. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente `{"stadt":"Hamburg"}`, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅
-- Offen: Browsertest durch den Admin (Open WebUI v0.12.4 und llama.cpp b11932: Chat mit Bild, Chat mit Websuche, Profile, normaler Nutzer ohne Parameter). Danach altes Image v0.12.3 mit `docker rmi` und `/opt/llama.cpp/llama-server.b11731` entfernen.
+- Browsertest durch den Admin (Open WebUI v0.12.4 und llama.cpp b11932: Chat mit Bild, Chat mit Websuche, Profile, normaler Nutzer ohne Parameter) ok ✅. Danach altes Image v0.12.3 gezielt mit `docker rmi` und die Kopie `/opt/llama.cpp/llama-server.b11731` entfernt; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11731`) bzw. Image v0.12.3 mit der Sicherung `bak-update-v0.12.4`.
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
