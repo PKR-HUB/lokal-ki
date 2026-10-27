@@ -441,4 +441,36 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - `apt autoremove --purge`: `nvidia-firmware-595-595.91.07` (Firmware des alten Treibers, geladen ist 595.99.02) und `libnss3-tools` entfernt. Danach `caddy` und `llama-server` aktiv, `nvidia-smi` ok ✅.
 - Reste des Altkernels 7.0.0-30 (`linux-image-unsigned`, `linux-modules`, `linux-main-modules-zfs`) vom Admin per `apt purge` entfernt (Claude-Code-Sicherheitsprüfung hatte den Aufruf blockiert); es läuft 7.0.0-38. `grub-pc` bleibt als rc-Paket: sein Purge-Skript löscht `/etc/default/grub`, das auch `grub-efi` nutzt (Server bootet per EFI). Befehl in `Wartung.md` Abschnitt 2 nimmt `grub-pc` jetzt aus.
 
+### Update Open WebUI v0.12.3 → v0.12.4 – 2026-10-27
+
+- Anlass: v0.12.4 (2026-10-25) enthält Sicherheitskorrekturen (im Changelog nicht einzeln aufgeführt, das Projekt empfiehlt ein sofortiges Update). Außerdem: „Prägnanter“/„Mehr Details“ überarbeiten jetzt die Antwort (bisher bekam das Modell die Anweisung ohne die Antwort), zusätzliche Leerzeichen am Absatzanfang aus 0.12.3 behoben. Das Docker-Image läuft jetzt mit Python 3.12 auf Debian 13; für uns ohne Folgen, da keine eigenen Python-Funktionen mehr installiert sind (`outlook_kopieren` hat `p5-knoepfe.sh` entfernt). Ablauf nach `Wartung.md` Abschnitt 3.
+- Image `ghcr.io/open-webui/open-webui:v0.12.4@sha256:a5b9e403d19154796850679c8c5d1295301cee954be8b84ddd62af92426558f7` in `docker-compose.yml`. Sicherung `data/webui.db.bak-update-v0.12.4` (SQLite-Backup, `integrity_check` ok). Ausgerollt mit `scripts/p4-openwebui.sh`, Dauer bis `/health` ca. 29 s. `/api/version` liefert 0.12.4. Keine Datenbank-Migration (Alembic-Stand `0bd252b206fb` unverändert, Tabellen identisch).
+- `scripts/p5-profile.sh`, `p5-kopieren.sh` (12 von 12 Konten an), `p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅. Im Log keine Fehler außer einem `KeyError` von socket.io (Browser, der sich nach dem Neustart mit der alten Sitzung neu verbindet, harmlos) und den bekannten Warnungen (grpcio, pydub).
+- Stylesheet (P5-A9): `index.html` lädt weiter `/static/custom.css`, `speak-button-` und `continue-response-button` im Build vorhanden ✅ (Kommentar in `custom.css` angepasst, mit `scripts/p4-caddy.sh` ausgerollt).
+- Konfiguration in der DB, Vergleich mit der Sicherung: neu nur `ldap.server.default_email_domain` (leer), `skills.lazy_loading.enable` (`false`) und `ui.visibility` (`{}`), sonst unverändert. Neues Recht `workspace.models_hidden`, Standard `false`; bleibt so.
+- Zu beachten: Ab v0.12.4 können alle Nutzer mit Zugriff auf ein Modell dessen Modell-Optionen (z. B. Denkstufe) wählen, unabhängig von „Chat-Steuerung erlauben“. Unsere Profile definieren keine solchen Optionen; im Browsertest prüfen, dass Büro-Nutzer keine Parameter oder System-Prompt-Felder sehen.
+
+### Update llama.cpp b11731 → b11932 – 2026-10-27
+
+- Anlass: Auftrag des Admins zusammen mit dem Open-WebUI-Update. Relevant aus 201 Commits: Sicherheit/Robustheit: Rekursionsgrenze in der Grammatik (#29755, #31153), JSON tiefer als 128 Ebenen im Chat abgelehnt (#30242), CPU-/Speicher-Erschöpfung durch den DRY-Sequence-Breaker behoben (#31035), Jinja-Korrekturen (#31059, #30941). CUDA-Leistung: FFN gate/up mit GLU in MMQ zusammengefasst (#29948), Qwen-MRoPE mit set-rows zusammengefasst (#31025), CUDA-Graphen in Abschnitten (#30804). Risiken: Einstiegspunkt des Servers umgebaut (#31113), Bildvorverarbeitung für Qwen-VL an transformers angeglichen (#30736), daher Werkzeugaufruf und Bild-Chat getestet. Neu `--connect` (experimenteller P2P-Tunnel nach außen, #28277): Standard aus, die Unit setzt weder Flag noch `LLAMA_ARG_CONNECT`; `/props` liefert keinen `connect_code`.
+- Altes Binary gesichert als `/opt/llama.cpp/llama-server.b11731`. Build `LLAMA_TAG=b11932 scripts/p3-build-llama.sh` (Commit `0c8c59ef3d1b7a5c073f3cd1c2fe28d4fa960c89`, `version: 0.7.0-dev (build 11932)`), weiter mit CUDA 13.3, Dauer ca. 3:00 min, Dienst lief währenddessen weiter. Standard-Tag im Skript auf `b11932` gesetzt.
+- CUDA 13.4 (Prüfauftrag vom 2026-10-21): nicht gewechselt. b11932 baut und läuft mit 13.3, der Treiber 595 unterstützt nativ CUDA 13.2 (13.4 nur über Minor-Version-Kompatibilität), und keiner der Commits verlangt eine neuere CUDA-Version. Nächste Prüfung wie geplant halbjährlich.
+- Flags: alle 16 Flags der Unit in `--help` von b11932 vorhanden, Unit nicht geändert. Neue Optionen gegenüber b11731 nur `--connect`, `--connect-code` und `--models-memory-margin` (Router-Modus, nicht genutzt).
+- Neustart `sudo systemctl restart llama-server` (Auftrag des Admins, beide Slots vorher frei), bereit nach 4 s; `/props`: `b11932-0c8c59ef3`, 2 Slots, Vision an, MTP-Draft-Kontext angelegt. Lauscht nur auf `127.0.0.1:8080` ✅.
+- Messung bei 500 W (`bench/b11932-2026-10-27/`), Vergleich mit b11731:
+
+| Messung | b11731 | b11932 |
+|---|---|---|
+| A3 Generierung, MTP-Quote ~0,62–0,64 | 144,2 / 144,6 Token/s | 146,5 Token/s (0,63) |
+| A3 Generierung, MTP-Quote ~0,47–0,48 | 122,4 Token/s (0,48) | 125,3 (0,48) / 122,9 (0,47) Token/s |
+| A3 Gesamtzeit | 11,7 / 17,2 / 17,1 s | 12,6 / 10,7 / 17,0 s (1.285–2.452 Token) |
+| A4 2 parallel, je | 102,8 (0,47) / 119,3 (0,62) Token/s | 126,9 (0,64) / 128,0 (0,64) Token/s; 3. Anfrage wartet und wird beantwortet (115,1 Token/s, 0,44) |
+| Prefill 54k Tokens (2 Slots) | ca. 2.450 Token/s | ca. 2.487 Token/s |
+| VRAM | 24.696 MiB | 24.696 MiB |
+| Leistung (Mittel) / max. Temperatur | ca. 496 W / 71 °C | ca. 496 W / 69 °C |
+
+  Generierung bei gleicher Annahmequote ca. 1–2 % schneller, Prefill ca. 1,5 % schneller, VRAM gleich. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
+- Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente `{"stadt":"Hamburg"}`, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅
+- Offen: Browsertest durch den Admin (Open WebUI v0.12.4 und llama.cpp b11932: Chat mit Bild, Chat mit Websuche, Profile, normaler Nutzer ohne Parameter). Danach altes Image v0.12.3 mit `docker rmi` und `/opt/llama.cpp/llama-server.b11731` entfernen.
+
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
