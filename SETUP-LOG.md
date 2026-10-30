@@ -532,3 +532,8 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - `qwen38-code` (nur Admin, nicht vom Skript verwaltet) bleibt bei `medium`.
 - Rückmeldung des Admins nach Test im Browser: „deutlich schneller“ ✅
 - Abweichung **P5-A-Denkstufe**: Die PRD/SETUP-LOG P5 nennen `medium`; jetzt gilt `low`. Begründung: Wunsch des Admins.
+
+### System-Prompt Backoffice neu – 2026-10-30
+
+- `Backoffice.md` vom Admin neu gegliedert (Commit `d14de88`: Aufgaben und Vorrang, Tagesfahrt ab 10 Stunden), 921 Zeilen, ca. 10.900 Tokens (`/tokenize`).
+- `scripts/p5-profile.sh`: Sicherung `data/webui.db.bak-p5-profile`, nur `qwen38-backoffice` geändert, Neustart, `/health` ok ✅.
