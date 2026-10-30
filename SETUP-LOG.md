@@ -535,5 +535,5 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
 ### System-Prompt Backoffice neu – 2026-10-30
 
-- `Backoffice.md` vom Admin neu gegliedert (Commit `d14de88`: Aufgaben und Vorrang, Tagesfahrt ab 10 Stunden), 921 Zeilen, ca. 10.900 Tokens (`/tokenize`).
+- `Backoffice.md` vom Admin neu gegliedert (Commit `d14de88`: Aufgaben und Vorrang, Tagesfahrt ab 10 Stunden), 921 Zeilen, 10.857 Tokens (`/tokenize`); vorher 370 Zeilen, 11.079 Tokens, also ca. 220 Tokens kürzer.
 - `scripts/p5-profile.sh`: Sicherung `data/webui.db.bak-p5-profile`, nur `qwen38-backoffice` geändert, Neustart, `/health` ok ✅.
