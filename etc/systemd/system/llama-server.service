@@ -1,5 +1,5 @@
 [Unit]
-Description=llama.cpp server (Qwen3.8-27B UD-Q4_K_XL)
+Description=llama.cpp server (Qwen3.8-27B UD-Q6_K)
 After=network-online.target nvidia-persistenced.service
 Wants=network-online.target
 
@@ -7,7 +7,7 @@ Wants=network-online.target
 User=llm
 Group=llm
 ExecStart=/opt/llama.cpp/build/bin/llama-server \
-  -m /srv/models/qwen3.8-27b/Qwen3.8-27B-UD-Q4_K_XL.gguf \
+  -m /srv/models/qwen3.8-27b/Qwen3.8-27B-UD-Q6_K.gguf \
   --mmproj /srv/models/qwen3.8-27b/mmproj-F16.gguf \
   --alias qwen3.8-27b \
   -ngl 99 -fa on \

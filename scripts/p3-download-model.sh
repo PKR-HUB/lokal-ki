@@ -4,7 +4,7 @@
 set -euo pipefail
 REPO=unsloth/Qwen3.8-27B-GGUF
 DIR=/srv/models/qwen3.8-27b
-FILES=(Qwen3.8-27B-UD-Q4_K_XL.gguf mmproj-F16.gguf)
+FILES=(Qwen3.8-27B-UD-Q6_K.gguf mmproj-F16.gguf)
 
 id llm >/dev/null 2>&1 || sudo useradd -r -s /usr/sbin/nologin llm
 sudo install -d -o "$USER" -g llm -m 755 /srv/models "$DIR"

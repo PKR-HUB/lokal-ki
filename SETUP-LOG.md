@@ -474,3 +474,52 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Browsertest durch den Admin (Open WebUI v0.12.4 und llama.cpp b11932: Chat mit Bild, Chat mit Websuche, Profile, normaler Nutzer ohne Parameter) ok ✅. Danach altes Image v0.12.3 gezielt mit `docker rmi` und die Kopie `/opt/llama.cpp/llama-server.b11731` entfernt; Zurückrollen jetzt per Neubau (`LLAMA_TAG=b11731`) bzw. Image v0.12.3 mit der Sicherung `bak-update-v0.12.4`.
 
 **Stand P7:** `ADMIN.md`, `Wartung.md`, A2 und Gesamtübersicht erledigt. Offen bleiben nur A12 und A15 (nach Einrichtung von IDE und Pi).
+
+### Update Open WebUI v0.12.4 → v0.12.5 – 2026-10-30
+
+- Anlass: Auftrag des Admins; v0.12.5 (2026-10-29) enthält erneut Sicherheitskorrekturen (nicht einzeln aufgeführt, Update empfohlen). Für uns außerdem: abgeschnittene Antworten nach einem Neustart des Servers bleiben beendet, langsames Laden eines Chats ersetzt ihn nicht mehr durch eine alte Kopie, Umbenennen aus dem Chat-Menü. Geändert: Beim Modellwechsel im Chat gelten die Standard-Funktionen des neuen Profils (Websuche) zusätzlich zu den selbst gewählten. Ablauf nach `Wartung.md` Abschnitt 3.
+- Image `ghcr.io/open-webui/open-webui:v0.12.5@sha256:03443b8de6b617da9d900edd09b4bf1cb0ddbfdcba6afb42c548336a0b821ded` in `docker-compose.yml`. Sicherung `data/webui.db.bak-update-v0.12.5` (SQLite-Backup, `integrity_check` ok). Ausgerollt mit `scripts/p4-openwebui.sh`, Dauer bis `/health` ca. 17 s. `/api/version` liefert 0.12.5. Keine Datenbank-Migration (Alembic-Stand `0bd252b206fb`, Tabellen identisch).
+- Konfiguration in der DB, Vergleich mit der Sicherung (nur Hashes): neu nur `rag.embedding_content_prefix`, `rag.embedding_query_prefix` (beide `null`) und `rag.mistral_ocr_params` (`{}`), sonst unverändert.
+- `scripts/p5-profile.sh`, `p5-kopieren.sh` (12 von 12 Konten an), `p5-knoepfe.sh`: nichts geändert ✅. `sudo scripts/p6-loeschung.sh --probelauf`: läuft, alles 0 ✅. Im Log keine Fehler. Stylesheet (P5-A9): `index.html` lädt `/static/custom.css`, `speak-button-` und `continue-response-button` im Build vorhanden ✅.
+
+### Modellwechsel UD-Q4_K_XL → UD-Q6_K – 2026-10-30
+
+- Anlass: Wunsch des Admins; bei Übersetzungen machte UD-Q4_K_XL zu viele Fehler, Q6 quantisiert die Gewichte genauer.
+- Auswahl (Rechnung vorab: heute belegt 24.628 MiB, davon Modell 16,35 GiB; der Rest von ca. 7,7 GiB für KV-Cache 2 × 64k, mmproj und Puffer bleibt gleich; Karte 31,8 GiB, A14-Grenze 29 GB): UD-Q6_K 20,47 GiB → ca. 28,2 GiB ✅; UD-Q6_K_M 21,50 GiB → ca. 29,2 GiB (über A14); UD-Q6_K_L 22,53 GiB → ca. 30,2 GiB; UD-Q6_K_XL 23,56 GiB → ca. 31,3 GiB (bei 2 × 64k zu knapp). Entscheidung des Admins: **UD-Q6_K**, Kontext unverändert `-c 131072 -np 2`.
+- `scripts/p3-download-model.sh` lädt jetzt `Qwen3.8-27B-UD-Q6_K.gguf` (21.983.677.344 Byte, SHA256 aus dem Repo geprüft ✅) und `mmproj-F16.gguf` (unverändert). Unit `etc/systemd/system/llama-server.service`: nur Pfad und Beschreibung geändert, Alias `qwen3.8-27b` bleibt (Open-WebUI-Profile unverändert). Ausgerollt mit `scripts/p3-llama-service.sh` (beide Slots frei), bereit nach ca. 6 s.
+- `/props`: Q6_K geladen, 2 Slots, Vision an, MTP-Draft-Kontext angelegt. VRAM **28.552 MiB** (27,9 GiB) nach dem Start, wie berechnet.
+- Messung bei 500 W, zuerst noch mit b11932 (`bench/q6k-b11932-2026-10-30/`), Vergleich mit Q4_K_XL (b11932, 2026-10-27):
+
+| Messung | UD-Q4_K_XL | UD-Q6_K |
+|---|---|---|
+| A3 Generierung, MTP-Quote ~0,62–0,66 | 146,5 Token/s (0,63) | 127,1 (0,62) / 129,0 (0,63) / 131,4 (0,66) Token/s |
+| A3 Gesamtzeit | 12,6 / 10,7 / 17,0 s | 20,6 / 19,3 / 23,4 s |
+| A4 2 parallel, je | 126,9 / 128,0 Token/s (0,64) | 111,9 (0,64) / 108,4 (0,62) Token/s; 3. Anfrage wartet und wird beantwortet (125,9 Token/s) |
+| Prefill 54k Tokens (2 Slots) | ca. 2.487 Token/s | ca. 2.260 Token/s |
+| VRAM (A14) | 24.696 MiB | 28.602 MiB |
+| Leistung (Mittel) / max. Temperatur | ca. 496 W / 69 °C | ca. 495 W / 71 °C |
+
+  Generierung ca. 12–14 % langsamer, Prefill ca. 9 % langsamer, VRAM +3,8 GiB. A3 (≥ 100 Token/s, < 30 s), A4 (je ≥ 50 Token/s) und A14 (≤ 29 GB) bestanden ✅. Wie bisher beendete ein A14-Slot mit `max_tokens=2048` seine Denkphase nicht (für die VRAM-Messung unerheblich).
+- Die Q4-Datei bleibt bis zum Browsertest (Übersetzungen) als Rückweg liegen: Pfad in der Unit zurücksetzen, `scripts/p3-llama-service.sh`.
+- **P3-A8 – Modell UD-Q6_K statt UD-Q4_K_XL** (PRD 2, F-INF-01, 8.3): Weniger Fehler bei Übersetzungen auf Kosten von ca. 12 % Tempo und 3,8 GiB VRAM. Freier VRAM jetzt ca. 3,9 GiB; eine Erweiterung des Kontexts (Rechnung P5 „Kontext geprüft“) ist damit nicht mehr möglich.
+
+### Update llama.cpp b11932 → b12001 – 2026-10-30
+
+- Anlass: Auftrag des Admins zusammen mit dem Modellwechsel. Relevant aus 69 Commits: MTP/Spekulation: Checkpoint bei Drafts länger als `n_rs_seq` wiederhergestellt (#31350); Robustheit: Grenzprüfungen für Control-Vector-Schichten und M-RoPE-Positionen (#31336), `std::length_error` im RPC abgefangen (#31204, RPC nicht genutzt); Server: Denkstufen der Chat-Vorlage werden ausgegeben (#31271), Werkzeugaufrufe mit `tool_reference` (#31256). Neu `/v1/realtime` (Sprache, #31269, #31287): ohne Audio-Modell ohne Funktion, wie alles nur auf 127.0.0.1. Version jetzt 0.8.0-dev, der Rest betrifft andere Backends (Vulkan, SYCL, Metal, Hexagon), neue Modelle und die eingebaute Web-Oberfläche.
+- Altes Binary gesichert als `/opt/llama.cpp/llama-server.b11932`. Build `LLAMA_TAG=b12001 scripts/p3-build-llama.sh` (Commit `eb4e244be77a906a183cd4a00fd51d9ad3200955`, `version: 0.8.0-dev (build 12001)`), weiter mit CUDA 13.3, Dienst lief währenddessen weiter. Standard-Tag im Skript auf `b12001` gesetzt.
+- Flags: alle 16 Flags der Unit in `--help` von b12001 vorhanden, Liste der Optionen gegenüber b11932 unverändert. Unit nicht geändert.
+- Neustart `sudo systemctl restart llama-server` (beide Slots frei); `/props`: `b12001-eb4e244be`, 2 Slots, Vision an, kein `connect_code`. Lauscht nur auf `127.0.0.1:8080` ✅. VRAM 28.552 MiB, keine Fehler im Journal.
+- Messung bei 500 W (`bench/q6k-b12001-2026-10-30/`), mit Q6_K:
+
+| Messung | b11932 | b12001 |
+|---|---|---|
+| A3 Generierung | 127,1–131,4 Token/s (0,62–0,66) | 130,5 (0,65) / 133,6 (0,67) / 111,3 (0,50) Token/s |
+| A3 Gesamtzeit | 19,3–23,4 s | 12,1 / 20,8 / 16,9 s |
+| A4 2 parallel, je | 111,9 / 108,4 Token/s (0,62–0,64) | 110,5 (0,63) / 93,6 (0,47) Token/s; 3. Anfrage wartet und wird beantwortet (120,5 Token/s) |
+| Prefill 54k Tokens (2 Slots) | ca. 2.260 Token/s | ca. 2.258 Token/s |
+| VRAM (A14) | 28.602 MiB | 28.604 MiB |
+| Leistung (Mittel) / max. Temperatur | ca. 495 W / 71 °C | ca. 496 W / 72 °C |
+
+  Bei gleicher MTP-Annahmequote kein messbarer Unterschied. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
+- Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente `{"stadt":"Hamburg"}`, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅. Bild über die API (synthetisches PNG, links rot, rechts blau): „Links rot, rechts blau.“ ✅
+- Offen: Browsertest durch den Admin (Open WebUI v0.12.5, Übersetzungen mit Q6_K, Chat mit Bild und mit Websuche, normaler Nutzer ohne Parameter). Danach `/opt/llama.cpp/llama-server.b11932`, die Q4-Datei und das Image v0.12.4 entfernen.
