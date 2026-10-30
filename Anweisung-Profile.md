@@ -18,7 +18,7 @@ Die Nutzer sollen zwischen vier Profilen wählen, je nach Aufgabe. Der System-Pr
 
 - **Websuche** ist in allen vier Q3.8-Profilen in neuen Chats vorausgewählt (`defaultFeatureIds: ["web_search"]`, wie bisher bei `qwen38`). Dass das Modell nicht sofort lossucht, regeln die System-Prompts.
 - **Q3.8 None** entsteht aus dem bestehenden Profil `qwen38` („Qwen3.8“): umbenennen und System-Prompt entfernen, sonst nichts ändern. Die ID bleibt, damit vorhandene Chats und das Standardmodell weiter funktionieren. `qwen38` bleibt Standardmodell für alle.
-- **Die drei neuen Profile** übernehmen alle Einstellungen von `qwen38`: Basis `qwen3.8-27b`, `chat_template_kwargs {"reasoning_effort":"medium"}`, Sampling-Werte, Function Calling native, Capabilities (Vision, Upload, Code-Interpreter, eingebaute Werkzeuge, Websuche an, Bild aus). Unterschiede sind nur Name, ID, Beschreibung und System-Prompt.
+- **Die drei neuen Profile** übernehmen alle Einstellungen von `qwen38`: Basis `qwen3.8-27b`, `chat_template_kwargs {"reasoning_effort":"low"}` (bis 2026-10-30 `medium`, P5-A-Denkstufe), Sampling-Werte, Function Calling native, Capabilities (Vision, Upload, Code-Interpreter, eingebaute Werkzeuge, Websuche an, Bild aus). Unterschiede sind nur Name, ID, Beschreibung und System-Prompt.
 - **qwen38-code** und das versteckte Basismodell bleiben unverändert.
 - **Beschreibungen** in der Modellauswahl:
   - Q3.8 Büro: „Förmliche E-Mails und Briefe, z. B. an Versicherungen, IHK, Berufsschule, Handwerker.“

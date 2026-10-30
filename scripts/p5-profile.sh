@@ -31,7 +31,7 @@ VORSCHLAEGE = prompts["vorschlaege"]
 # Einstellungen wie Profil qwen38 (SETUP-LOG P5)
 PARAMS = {"temperature": 1.0, "top_p": 0.95, "top_k": 20, "min_p": 0.0,
           "presence_penalty": 0.0, "repeat_penalty": 1.0, "function_calling": "native",
-          "custom_params": {"chat_template_kwargs": json.dumps({"reasoning_effort": "medium"})}}
+          "custom_params": {"chat_template_kwargs": json.dumps({"reasoning_effort": "low"})}}
 META = {"profile_image_url": None, "background_image_url": None, "i18n": None, "knowledge": None,
         "capabilities": {"vision": True, "file_upload": True, "web_search": True, "image_generation": False,
                          "code_interpreter": True, "citations": True, "status_updates": True,

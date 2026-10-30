@@ -523,3 +523,11 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
   Bei gleicher MTP-Annahmequote kein messbarer Unterschied. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente `{"stadt":"Hamburg"}`, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅. Bild über die API (synthetisches PNG, links rot, rechts blau): „Links rot, rechts blau.“ ✅
 - Browsertest durch den Admin (Open WebUI v0.12.5, Übersetzungen mit Q6_K, Chat mit Bild und mit Websuche, normaler Nutzer ohne Parameter) ok ✅. Danach `Qwen3.8-27B-UD-Q4_K_XL.gguf`, `/opt/llama.cpp/llama-server.b11932` und das Image v0.12.4 (`docker rmi`) entfernt; Zurückrollen jetzt per Download (`p3-download-model.sh` mit altem Dateinamen), Neubau (`LLAMA_TAG=b11932`) bzw. Image v0.12.4 mit der Sicherung `bak-update-v0.12.5`.
+
+### Denkstufe medium → low – 2026-10-30
+
+- Anlass: Auftrag des Admins („thinking auf low“), kürzere Denkphase, schnellere Antworten.
+- Vorab geprüft: Die Chat-Vorlage kennt `low`. Testfrage „17*23“: Denkphase 117 statt 227 Zeichen, 73 statt 106 Tokens, Antwort gleich richtig.
+- `reasoning_effort` auf `low` gesetzt in `etc/systemd/system/llama-server.service` (Vorgabe für API und Basis-Modell) und `scripts/p5-profile.sh` (Profile Q3.8 Büro, Backoffice, Recherche, None). `scripts/p5-profile.sh`: Sicherung `data/webui.db.bak-p5-profile`, 4 Profile geändert, Neustart, `/health` ok ✅. `scripts/p3-llama-service.sh`: Unit installiert, `/health` ok ✅ (beide Slots vorher frei).
+- `qwen38-code` (nur Admin, nicht vom Skript verwaltet) bleibt bei `medium`.
+- Abweichung **P5-A-Denkstufe**: Die PRD/SETUP-LOG P5 nennen `medium`; jetzt gilt `low`. Begründung: Wunsch des Admins.

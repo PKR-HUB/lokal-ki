@@ -14,7 +14,7 @@ ExecStart=/opt/llama.cpp/build/bin/llama-server \
   -c 131072 -np 2 \
   --cache-type-k q8_0 --cache-type-v q8_0 \
   --jinja \
-  --chat-template-kwargs '{"reasoning_effort":"medium"}' \
+  --chat-template-kwargs '{"reasoning_effort":"low"}' \
   --spec-type draft-mtp --spec-draft-n-max 3 \
   --metrics \
   --host 127.0.0.1 --port 8080
