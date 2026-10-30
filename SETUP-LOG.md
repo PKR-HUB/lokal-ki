@@ -530,4 +530,5 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 - Vorab geprüft: Die Chat-Vorlage kennt `low`. Testfrage „17*23“: Denkphase 117 statt 227 Zeichen, 73 statt 106 Tokens, Antwort gleich richtig.
 - `reasoning_effort` auf `low` gesetzt in `etc/systemd/system/llama-server.service` (Vorgabe für API und Basis-Modell) und `scripts/p5-profile.sh` (Profile Q3.8 Büro, Backoffice, Recherche, None). `scripts/p5-profile.sh`: Sicherung `data/webui.db.bak-p5-profile`, 4 Profile geändert, Neustart, `/health` ok ✅. `scripts/p3-llama-service.sh`: Unit installiert, `/health` ok ✅ (beide Slots vorher frei).
 - `qwen38-code` (nur Admin, nicht vom Skript verwaltet) bleibt bei `medium`.
+- Rückmeldung des Admins nach Test im Browser: „deutlich schneller“ ✅
 - Abweichung **P5-A-Denkstufe**: Die PRD/SETUP-LOG P5 nennen `medium`; jetzt gilt `low`. Begründung: Wunsch des Admins.
