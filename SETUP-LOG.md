@@ -500,7 +500,7 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 | Leistung (Mittel) / max. Temperatur | ca. 496 W / 69 °C | ca. 495 W / 71 °C |
 
   Generierung ca. 12–14 % langsamer, Prefill ca. 9 % langsamer, VRAM +3,8 GiB. A3 (≥ 100 Token/s, < 30 s), A4 (je ≥ 50 Token/s) und A14 (≤ 29 GB) bestanden ✅. Wie bisher beendete ein A14-Slot mit `max_tokens=2048` seine Denkphase nicht (für die VRAM-Messung unerheblich).
-- Die Q4-Datei bleibt bis zum Browsertest (Übersetzungen) als Rückweg liegen: Pfad in der Unit zurücksetzen, `scripts/p3-llama-service.sh`.
+- Die Q4-Datei blieb bis zum Browsertest als Rückweg liegen (am selben Tag entfernt, siehe unten).
 - **P3-A8 – Modell UD-Q6_K statt UD-Q4_K_XL** (PRD 2, F-INF-01, 8.3): Weniger Fehler bei Übersetzungen auf Kosten von ca. 12 % Tempo und 3,8 GiB VRAM. Freier VRAM jetzt ca. 3,9 GiB; eine Erweiterung des Kontexts (Rechnung P5 „Kontext geprüft“) ist damit nicht mehr möglich.
 
 ### Update llama.cpp b11932 → b12001 – 2026-10-30
@@ -522,4 +522,4 @@ Hinweis Netzwerk (18:16–18:20 UTC): Nach dem Neustart kurz kein SSH vom Admin-
 
   Bei gleicher MTP-Annahmequote kein messbarer Unterschied. A3, A4, A14 bestanden ✅. Bei A14 beendeten beide Slots ihre Denkphase und antworteten.
 - Werkzeugaufruf über die API (synthetisches Werkzeug `wetter`): `finish_reason: tool_calls`, Argumente `{"stadt":"Hamburg"}`, Denkphase getrennt in `reasoning_content`; Folgeanfrage mit Werkzeugergebnis liefert passende Antwort ✅. Bild über die API (synthetisches PNG, links rot, rechts blau): „Links rot, rechts blau.“ ✅
-- Offen: Browsertest durch den Admin (Open WebUI v0.12.5, Übersetzungen mit Q6_K, Chat mit Bild und mit Websuche, normaler Nutzer ohne Parameter). Danach `/opt/llama.cpp/llama-server.b11932`, die Q4-Datei und das Image v0.12.4 entfernen.
+- Browsertest durch den Admin (Open WebUI v0.12.5, Übersetzungen mit Q6_K, Chat mit Bild und mit Websuche, normaler Nutzer ohne Parameter) ok ✅. Danach `Qwen3.8-27B-UD-Q4_K_XL.gguf`, `/opt/llama.cpp/llama-server.b11932` und das Image v0.12.4 (`docker rmi`) entfernt; Zurückrollen jetzt per Download (`p3-download-model.sh` mit altem Dateinamen), Neubau (`LLAMA_TAG=b11932`) bzw. Image v0.12.4 mit der Sicherung `bak-update-v0.12.5`.
